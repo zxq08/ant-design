@@ -2,12 +2,12 @@ import * as React from 'react';
 import classNames from 'classnames';
 import { composeRef } from 'rc-util/lib/ref';
 import SearchOutlined from '@ant-design/icons/SearchOutlined';
-import LoadingOutlined from '@ant-design/icons/LoadingOutlined';
-import Input, { InputProps } from './Input';
+import type { InputProps, InputRef } from './Input';
+import Input from './Input';
 import Button from '../button';
-import SizeContext, { SizeType } from '../config-provider/SizeContext';
-import { ConfigConsumer, ConfigConsumerProps } from '../config-provider';
-import { cloneElement, replaceElement } from '../_util/reactNode';
+import SizeContext from '../config-provider/SizeContext';
+import { ConfigContext } from '../config-provider';
+import { cloneElement } from '../_util/reactNode';
 
 export interface SearchProps extends InputProps {
   inputPrefixCls?: string;
@@ -22,11 +22,33 @@ export interface SearchProps extends InputProps {
   loading?: boolean;
 }
 
-const Search = React.forwardRef<Input, SearchProps>((props, ref) => {
-  const inputRef = React.useRef<Input>(null);
+const Search = React.forwardRef<InputRef, SearchProps>((props, ref) => {
+  const {
+    prefixCls: customizePrefixCls,
+    inputPrefixCls: customizeInputPrefixCls,
+    className,
+    size: customizeSize,
+    suffix,
+    enterButton = false,
+    addonAfter,
+    loading,
+    disabled,
+    onSearch: customOnSearch,
+    onChange: customOnChange,
+    onCompositionStart,
+    onCompositionEnd,
+    ...restProps
+  } = props;
+
+  const { getPrefixCls, direction } = React.useContext(ConfigContext);
+  const contextSize = React.useContext(SizeContext);
+  const composedRef = React.useRef<boolean>(false);
+
+  const size = customizeSize || contextSize;
+
+  const inputRef = React.useRef<InputRef>(null);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { onChange: customOnChange, onSearch: customOnSearch } = props;
     if (e && e.target && e.type === 'click' && customOnSearch) {
       customOnSearch((e as React.ChangeEvent<HTMLInputElement>).target.value, e);
     }
@@ -42,169 +64,107 @@ const Search = React.forwardRef<Input, SearchProps>((props, ref) => {
   };
 
   const onSearch = (e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLInputElement>) => {
-    const { onSearch: customOnSearch, loading, disabled } = props;
-    if (loading || disabled) {
+    if (customOnSearch) {
+      customOnSearch(inputRef.current?.input?.value!, e);
+    }
+  };
+
+  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (composedRef.current) {
       return;
     }
-    if (customOnSearch) {
-      customOnSearch(inputRef.current?.input.value!, e);
-    }
+    onSearch(e);
   };
 
-  const renderLoading = (prefixCls: string) => {
-    const { enterButton, size: customizeSize } = props;
+  const prefixCls = getPrefixCls('input-search', customizePrefixCls);
+  const inputPrefixCls = getPrefixCls('input', customizeInputPrefixCls);
 
-    if (enterButton) {
-      return (
-        <SizeContext.Consumer key="enterButton">
-          {size => (
-            <Button className={`${prefixCls}-button`} type="primary" size={customizeSize || size}>
-              <LoadingOutlined />
-            </Button>
-          )}
-        </SizeContext.Consumer>
-      );
-    }
-    return <LoadingOutlined className={`${prefixCls}-icon`} key="loadingIcon" />;
-  };
+  const searchIcon = typeof enterButton === 'boolean' ? <SearchOutlined /> : null;
+  const btnClassName = `${prefixCls}-button`;
 
-  const renderSuffix = (prefixCls: string) => {
-    const { suffix, enterButton, loading } = props;
-
-    if (loading && !enterButton) {
-      return [suffix, renderLoading(prefixCls)];
-    }
-
-    if (enterButton) return suffix;
-
-    const icon = (
-      <SearchOutlined className={`${prefixCls}-icon`} key="searchIcon" onClick={onSearch} />
+  let button: React.ReactNode;
+  const enterButtonAsElement = (enterButton || {}) as React.ReactElement;
+  const isAntdButton =
+    enterButtonAsElement.type && (enterButtonAsElement.type as typeof Button).__ANT_BUTTON === true;
+  if (isAntdButton || enterButtonAsElement.type === 'button') {
+    button = cloneElement(enterButtonAsElement, {
+      onMouseDown,
+      onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
+        enterButtonAsElement?.props?.onClick?.(e);
+        onSearch(e);
+      },
+      key: 'enterButton',
+      ...(isAntdButton
+        ? {
+            className: btnClassName,
+            size,
+          }
+        : {}),
+    });
+  } else {
+    button = (
+      <Button
+        className={btnClassName}
+        type={enterButton ? 'primary' : undefined}
+        size={size}
+        disabled={disabled}
+        key="enterButton"
+        onMouseDown={onMouseDown}
+        onClick={onSearch}
+        loading={loading}
+        icon={searchIcon}
+      >
+        {enterButton}
+      </Button>
     );
+  }
 
-    if (suffix) {
-      return [
-        replaceElement(suffix, null, {
-          key: 'suffix',
-        }),
-        icon,
-      ];
-    }
+  if (addonAfter) {
+    button = [
+      button,
+      cloneElement(addonAfter, {
+        key: 'addonAfter',
+      }),
+    ];
+  }
 
-    return icon;
+  const cls = classNames(
+    prefixCls,
+    {
+      [`${prefixCls}-rtl`]: direction === 'rtl',
+      [`${prefixCls}-${size}`]: !!size,
+      [`${prefixCls}-with-button`]: !!enterButton,
+    },
+    className,
+  );
+
+  const handleOnCompositionStart: React.CompositionEventHandler<HTMLInputElement> = e => {
+    composedRef.current = true;
+    onCompositionStart?.(e);
   };
 
-  const renderAddonAfter = (prefixCls: string, size: SizeType) => {
-    const { enterButton, disabled, addonAfter, loading } = props;
-    const btnClassName = `${prefixCls}-button`;
-
-    if (loading && enterButton) {
-      return [renderLoading(prefixCls), addonAfter];
-    }
-
-    if (!enterButton) return addonAfter;
-
-    let button: React.ReactNode;
-    const enterButtonAsElement = enterButton as React.ReactElement;
-    const isAntdButton =
-      enterButtonAsElement.type &&
-      (enterButtonAsElement.type as typeof Button).__ANT_BUTTON === true;
-    if (isAntdButton || enterButtonAsElement.type === 'button') {
-      button = cloneElement(enterButtonAsElement, {
-        onMouseDown,
-        onClick: onSearch,
-        key: 'enterButton',
-        ...(isAntdButton
-          ? {
-              className: btnClassName,
-              size,
-            }
-          : {}),
-      });
-    } else {
-      button = (
-        <Button
-          className={btnClassName}
-          type="primary"
-          size={size}
-          disabled={disabled}
-          key="enterButton"
-          onMouseDown={onMouseDown}
-          onClick={onSearch}
-        >
-          {enterButton === true ? <SearchOutlined /> : enterButton}
-        </Button>
-      );
-    }
-
-    if (addonAfter) {
-      return [
-        button,
-        replaceElement(addonAfter, null, {
-          key: 'addonAfter',
-        }),
-      ];
-    }
-
-    return button;
+  const handleOnCompositionEnd: React.CompositionEventHandler<HTMLInputElement> = e => {
+    composedRef.current = false;
+    onCompositionEnd?.(e);
   };
 
-  const renderSearch = ({ getPrefixCls, direction }: ConfigConsumerProps) => {
-    const {
-      prefixCls: customizePrefixCls,
-      inputPrefixCls: customizeInputPrefixCls,
-      enterButton,
-      className,
-      size: customizeSize,
-      ...restProps
-    } = props;
-
-    delete (restProps as any).onSearch;
-    delete (restProps as any).loading;
-
-    const prefixCls = getPrefixCls('input-search', customizePrefixCls);
-    const inputPrefixCls = getPrefixCls('input', customizeInputPrefixCls);
-
-    const getClassName = (size: SizeType) => {
-      let inputClassName;
-      if (enterButton) {
-        inputClassName = classNames(prefixCls, className, {
-          [`${prefixCls}-rtl`]: direction === 'rtl',
-          [`${prefixCls}-enter-button`]: !!enterButton,
-          [`${prefixCls}-${size}`]: !!size,
-        });
-      } else {
-        inputClassName = classNames(prefixCls, className, {
-          [`${prefixCls}-rtl`]: direction === 'rtl',
-        });
-      }
-      return inputClassName;
-    };
-
-    return (
-      <SizeContext.Consumer>
-        {size => (
-          <Input
-            ref={composeRef<Input>(inputRef, ref)}
-            onPressEnter={onSearch}
-            {...restProps}
-            size={customizeSize || size}
-            prefixCls={inputPrefixCls}
-            addonAfter={renderAddonAfter(prefixCls, customizeSize || size)}
-            suffix={renderSuffix(prefixCls)}
-            onChange={onChange}
-            className={getClassName(customizeSize || size)}
-          />
-        )}
-      </SizeContext.Consumer>
-    );
-  };
-
-  return <ConfigConsumer>{renderSearch}</ConfigConsumer>;
+  return (
+    <Input
+      ref={composeRef<InputRef>(inputRef, ref)}
+      onPressEnter={onPressEnter}
+      {...restProps}
+      size={size}
+      onCompositionStart={handleOnCompositionStart}
+      onCompositionEnd={handleOnCompositionEnd}
+      prefixCls={inputPrefixCls}
+      addonAfter={button}
+      suffix={suffix}
+      onChange={onChange}
+      className={cls}
+      disabled={disabled}
+    />
+  );
 });
-
-Search.defaultProps = {
-  enterButton: false,
-};
 
 Search.displayName = 'Search';
 

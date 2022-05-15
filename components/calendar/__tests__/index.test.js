@@ -10,6 +10,7 @@ import Group from '../../radio/group';
 import Button from '../../radio/radioButton';
 import mountTest from '../../../tests/shared/mountTest';
 import rtlTest from '../../../tests/shared/rtlTest';
+import { render, fireEvent } from '../../../tests/utils';
 
 describe('Calendar', () => {
   mountTest(Calendar);
@@ -27,13 +28,34 @@ describe('Calendar', () => {
     findSelectItem(wrapper).at(index).simulate('click');
   }
 
+  // https://github.com/ant-design/ant-design/issues/30392
+  it('should be able to set undefined or null', () => {
+    expect(() => {
+      const wrapper = mount(<Calendar />);
+      wrapper.setProps({ value: null });
+    }).not.toThrow();
+    expect(() => {
+      const wrapper = mount(<Calendar />);
+      wrapper.setProps({ value: undefined });
+    }).not.toThrow();
+  });
+
   it('Calendar should be selectable', () => {
+    MockDate.set(Moment('2000-01-01').valueOf());
+
     const onSelect = jest.fn();
-    const wrapper = mount(<Calendar onSelect={onSelect} />);
-    wrapper.find('.ant-picker-cell').at(0).simulate('click');
+    const onChange = jest.fn();
+    const { container } = render(<Calendar onSelect={onSelect} onChange={onChange} />);
+
+    fireEvent.click(container.querySelector('.ant-picker-cell'));
     expect(onSelect).toHaveBeenCalledWith(expect.anything());
+
     const value = onSelect.mock.calls[0][0];
     expect(Moment.isMoment(value)).toBe(true);
+
+    expect(onChange).toHaveBeenCalled();
+
+    MockDate.reset();
   });
 
   it('only Valid range should be selectable', () => {
@@ -115,9 +137,7 @@ describe('Calendar', () => {
   it('Calendar MonthSelect should display correct label', () => {
     const validRange = [Moment('2018-02-02'), Moment('2019-06-1')];
     const wrapper = mount(<Calendar validRange={validRange} defaultValue={Moment('2019-01-01')} />);
-    const { options } = wrapper.find('MonthSelect > Select').props();
-    expect(options.length).toBe(6);
-    expect(options[5]).toEqual({ label: 'Jun', value: 5 });
+    expect(wrapper.render()).toMatchSnapshot();
   });
 
   it('Calendar should change mode by prop', () => {
@@ -212,7 +232,7 @@ describe('Calendar', () => {
     expect(onValueChange).toHaveBeenCalledWith(value.year('2019').month('3'));
   });
 
-  it('if start.month > value.month, set value.month to start.month ', () => {
+  it('if start.month > value.month, set value.month to start.month', () => {
     const value = new Moment('1990-01-03');
     const start = new Moment('2019-11-01');
     const end = new Moment('2019-03-01');
@@ -221,7 +241,7 @@ describe('Calendar', () => {
     expect(onValueChange).toHaveBeenCalledWith(value.year('2019').month('10'));
   });
 
-  it('if change year and new month > end month, set value.month to end.month ', () => {
+  it('if change year and new month > end month, set value.month to end.month', () => {
     const value = new Moment('2018-11-03');
     const start = new Moment('2000-01-01');
     const end = new Moment('2019-03-01');
@@ -363,14 +383,12 @@ describe('Calendar', () => {
     expect(onMonthChange).toHaveBeenCalled();
 
     // Type
-    const headerRenderWithTypeChange = jest.fn(({ type }) => {
-      return (
-        <Group size="small" onChange={onTypeChange} value={type}>
-          <Button value="month">Month</Button>
-          <Button value="year">Year</Button>
-        </Group>
-      );
-    });
+    const headerRenderWithTypeChange = jest.fn(({ type }) => (
+      <Group size="small" onChange={onTypeChange} value={type}>
+        <Button value="month">Month</Button>
+        <Button value="year">Year</Button>
+      </Group>
+    ));
 
     const wrapperWithTypeChange = mount(
       <Calendar fullscreen={false} headerRender={headerRenderWithTypeChange} />,
@@ -392,5 +410,21 @@ describe('Calendar', () => {
       <Calendar mode="year" monthFullCellRender={() => <div className="bamboo">Light</div>} />,
     );
     expect(wrapper.find('.bamboo').first().text()).toEqual('Light');
+  });
+
+  it('when fullscreen is false, the element returned by dateFullCellRender should be interactive', () => {
+    const onClick = jest.fn();
+    const wrapper = mount(
+      <Calendar
+        fullscreen={false}
+        dateFullCellRender={() => (
+          <div className="bamboo" onClick={onClick}>
+            Light
+          </div>
+        )}
+      />,
+    );
+    wrapper.find('.bamboo').first().simulate('click');
+    expect(onClick).toBeCalled();
   });
 });

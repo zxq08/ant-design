@@ -14,7 +14,7 @@ Ant Design React 致力于提供给程序员**愉悦**的开发体验。
 这是一个最简单的 Ant Design 组件的在线 codesandbox 演示。
 
 <iframe
-  src="https://codesandbox.io/embed/antd-reproduction-template-6e93z?autoresize=1&fontsize=14&hidenavigation=1&theme=dark"
+  src="https://codesandbox.io/embed/antd-reproduction-template-6e93z?autoresize=1&fontsize=14&hidenavigation=1&theme=light"
   style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
   title="antd reproduction template"
   allow="geolocation; microphone; camera; midi; vr; accelerometer; gyroscope; payment; ambient-light-sensor; encrypted-media; usb"
@@ -34,7 +34,7 @@ import React, { useState } from 'react';
 import { render } from 'react-dom';
 import { ConfigProvider, DatePicker, message } from 'antd';
 // 由于 antd 组件的默认文案是英文，所以需要修改为中文
-import zhCN from 'antd/es/locale/zh_CN';
+import zhCN from 'antd/lib/locale/zh_CN';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import 'antd/dist/antd.css';
@@ -110,20 +110,6 @@ You are using a whole package of antd, please use https://www.npmjs.com/package/
 ```
 
 ![控制台警告](https://zos.alipayobjects.com/rmsportal/GHIRszVcmjccgZRakJDQ.png)
-
-## 使用 Day.js 替换 Moment.js 优化打包大小
-
-你可以使用 [antd-dayjs-webpack-plugin](https://github.com/ant-design/antd-dayjs-webpack-plugin) 插件用 [Day.js](https://day.js.org/) 替换 Moment.js 来大幅减小打包大小。这需要更新 webpack 的配置文件如下：
-
-```js
-// webpack-config.js
-import AntdDayjsWebpackPlugin from 'antd-dayjs-webpack-plugin';
-
-module.exports = {
-  // ...
-  plugins: [new AntdDayjsWebpackPlugin()],
-};
-```
 
 ## 自行构建
 

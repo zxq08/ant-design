@@ -3,7 +3,7 @@ import { mount } from 'enzyme';
 import Table from '..';
 import mountTest from '../../../tests/shared/mountTest';
 import rtlTest from '../../../tests/shared/rtlTest';
-import { sleep } from '../../../tests/utils';
+import { sleep, render } from '../../../tests/utils';
 
 const { Column, ColumnGroup } = Table;
 
@@ -160,6 +160,19 @@ describe('Table', () => {
     );
   });
 
+  it('should not crash when dataSource is array with none-object items', () => {
+    mount(
+      <Table
+        columns={[
+          {
+            title: 'name',
+          },
+        ]}
+        dataSource={['1', 2, undefined, {}, null, true, false, 0]}
+      />,
+    );
+  });
+
   it('prevent touch event', () => {
     const wrapper = mount(
       <Table
@@ -245,7 +258,24 @@ describe('Table', () => {
         dataIndex: 'name',
       },
     ];
-    mount(<Table columns={columns} rowKey={record => record.key} />);
+    render(<Table columns={columns} rowKey={record => record.key} />);
+    expect(warnSpy).not.toBeCalled();
+  });
+
+  it('should support ref', () => {
+    warnSpy.mockReset();
+    const columns = [
+      {
+        title: 'Name',
+        key: 'name',
+        dataIndex: 'name',
+      },
+    ];
+    const Wrapper = () => {
+      const ref = React.useRef();
+      return <Table ref={ref} columns={columns} />;
+    };
+    render(<Wrapper />);
     expect(warnSpy).not.toBeCalled();
   });
 });

@@ -2,12 +2,13 @@ import * as React from 'react';
 import classNames from 'classnames';
 import useMergedState from 'rc-util/lib/hooks/useMergedState';
 import Radio from './radio';
-import { RadioGroupProps, RadioChangeEvent, RadioGroupButtonStyle } from './interface';
+import type { RadioGroupProps, RadioChangeEvent, RadioGroupButtonStyle } from './interface';
 import { ConfigContext } from '../config-provider';
 import SizeContext from '../config-provider/SizeContext';
 import { RadioGroupContextProvider } from './context';
+import getDataOrAriaProps from '../_util/getDataOrAriaProps';
 
-const RadioGroup = React.forwardRef<unknown, RadioGroupProps>((props, ref) => {
+const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>((props, ref) => {
   const { getPrefixCls, direction } = React.useContext(ConfigContext);
   const size = React.useContext(SizeContext);
 
@@ -32,8 +33,7 @@ const RadioGroup = React.forwardRef<unknown, RadioGroupProps>((props, ref) => {
       prefixCls: customizePrefixCls,
       className = '',
       options,
-      optionType,
-      buttonStyle,
+      buttonStyle = 'outline' as RadioGroupButtonStyle,
       disabled,
       children,
       size: customizeSize,
@@ -47,15 +47,13 @@ const RadioGroup = React.forwardRef<unknown, RadioGroupProps>((props, ref) => {
     let childrenToRender = children;
     // 如果存在 options, 优先使用
     if (options && options.length > 0) {
-      const optionsPrefixCls = optionType === 'button' ? `${prefixCls}-button` : prefixCls;
       childrenToRender = options.map(option => {
-        if (typeof option === 'string') {
+        if (typeof option === 'string' || typeof option === 'number') {
           // 此处类型自动推导为 string
           return (
             <Radio
-              ref={ref}
-              key={option}
-              prefixCls={optionsPrefixCls}
+              key={option.toString()}
+              prefixCls={prefixCls}
               disabled={disabled}
               value={option}
               checked={value === option}
@@ -67,9 +65,8 @@ const RadioGroup = React.forwardRef<unknown, RadioGroupProps>((props, ref) => {
         // 此处类型自动推导为 { label: string value: string }
         return (
           <Radio
-            ref={ref}
             key={`radio-group-value-options-${option.value}`}
-            prefixCls={optionsPrefixCls}
+            prefixCls={prefixCls}
             disabled={option.disabled || disabled}
             value={option.value}
             checked={value === option.value}
@@ -93,11 +90,13 @@ const RadioGroup = React.forwardRef<unknown, RadioGroupProps>((props, ref) => {
     );
     return (
       <div
+        {...getDataOrAriaProps(props)}
         className={classString}
         style={style}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         id={id}
+        ref={ref}
       >
         {childrenToRender}
       </div>
@@ -111,15 +110,12 @@ const RadioGroup = React.forwardRef<unknown, RadioGroupProps>((props, ref) => {
         value,
         disabled: props.disabled,
         name: props.name,
+        optionType: props.optionType,
       }}
     >
       {renderGroup()}
     </RadioGroupContextProvider>
   );
 });
-
-RadioGroup.defaultProps = {
-  buttonStyle: 'outline' as RadioGroupButtonStyle,
-};
 
 export default React.memo(RadioGroup);

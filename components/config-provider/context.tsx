@@ -1,17 +1,31 @@
 import * as React from 'react';
-import defaultRenderEmpty, { RenderEmptyHandler } from './renderEmpty';
-import { Locale } from '../locale-provider';
-import { SizeType } from './SizeContext';
+import type { RenderEmptyHandler } from './renderEmpty';
+import defaultRenderEmpty from './renderEmpty';
+import type { Locale } from '../locale-provider';
+import type { SizeType } from './SizeContext';
+import type { RequiredMark } from '../form/Form';
+
+export interface Theme {
+  primaryColor?: string;
+  infoColor?: string;
+  successColor?: string;
+  processingColor?: string;
+  errorColor?: string;
+  warningColor?: string;
+}
 
 export interface CSPConfig {
   nonce?: string;
 }
 
+export type DirectionType = 'ltr' | 'rtl' | undefined;
+
 export interface ConfigConsumerProps {
   getTargetContainer?: () => HTMLElement;
-  getPopupContainer?: (triggerNode: HTMLElement) => HTMLElement;
+  getPopupContainer?: (triggerNode?: HTMLElement) => HTMLElement;
   rootPrefixCls?: string;
-  getPrefixCls: (suffixCls: string, customizePrefixCls?: string) => string;
+  iconPrefixCls?: string;
+  getPrefixCls: (suffixCls?: string, customizePrefixCls?: string) => string;
   renderEmpty: RenderEmptyHandler;
   csp?: CSPConfig;
   autoInsertSpaceInButton?: boolean;
@@ -22,21 +36,27 @@ export interface ConfigConsumerProps {
   pageHeader?: {
     ghost: boolean;
   };
-  direction?: 'ltr' | 'rtl';
+  direction?: DirectionType;
   space?: {
     size?: SizeType | number;
   };
   virtual?: boolean;
   dropdownMatchSelectWidth?: boolean;
+  form?: {
+    requiredMark?: RequiredMark;
+    colon?: boolean;
+  };
 }
+
+const defaultGetPrefixCls = (suffixCls?: string, customizePrefixCls?: string) => {
+  if (customizePrefixCls) return customizePrefixCls;
+
+  return suffixCls ? `ant-${suffixCls}` : 'ant';
+};
 
 export const ConfigContext = React.createContext<ConfigConsumerProps>({
   // We provide a default function for Context without provider
-  getPrefixCls: (suffixCls: string, customizePrefixCls?: string) => {
-    if (customizePrefixCls) return customizePrefixCls;
-
-    return suffixCls ? `ant-${suffixCls}` : 'ant';
-  },
+  getPrefixCls: defaultGetPrefixCls,
 
   renderEmpty: defaultRenderEmpty,
 });
@@ -61,6 +81,8 @@ interface ConsumerConfig {
 interface ConstructorProps {
   displayName?: string;
 }
+
+/** @deprecated Use hooks instead. This is a legacy function */
 export function withConfigConsumer<ExportProps extends BasicExportProps>(config: ConsumerConfig) {
   return function withConfigConsumerFunc<ComponentDef>(
     Component: IReactComponent,

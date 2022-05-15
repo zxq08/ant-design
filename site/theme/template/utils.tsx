@@ -118,9 +118,10 @@ export function isZhCN(pathname: string) {
 export function getLocalizedPathname(
   path: string,
   zhCN?: boolean,
+  query?: { [key: string]: any },
   hash?: {
-    zhCN: string;
-    enUS: string;
+    zhCN?: string;
+    enUS?: string;
   },
 ) {
   const pathname = path.startsWith('/') ? path : `/${path}`;
@@ -141,7 +142,7 @@ export function getLocalizedPathname(
     fullPath += `#${localHash}`;
   }
 
-  return fullPath;
+  return { pathname: fullPath, query };
 }
 
 export function ping(callback: (status: string) => void) {
@@ -215,6 +216,4 @@ export function getMetaDescription(jml?: any[] | null) {
   return paragraph;
 }
 
-export const getThemeConfig = () => {
-  return themeConfig;
-};
+export const getThemeConfig = () => themeConfig;

@@ -1,18 +1,14 @@
 import * as React from 'react';
 import classNames from 'classnames';
-import omit from 'omit.js';
+import omit from 'rc-util/lib/omit';
 import CloseOutlined from '@ant-design/icons/CloseOutlined';
 
 import CheckableTag from './CheckableTag';
 import { ConfigContext } from '../config-provider';
-import {
-  PresetColorTypes,
-  PresetStatusColorTypes,
-  PresetColorType,
-  PresetStatusColorType,
-} from '../_util/colors';
+import type { PresetColorType, PresetStatusColorType } from '../_util/colors';
+import { PresetColorTypes, PresetStatusColorTypes } from '../_util/colors';
 import Wave from '../_util/wave';
-import { LiteralUnion } from '../_util/type';
+import type { LiteralUnion } from '../_util/type';
 
 export { CheckableTagProps } from './CheckableTag';
 
@@ -23,7 +19,7 @@ export interface TagProps extends React.HTMLAttributes<HTMLSpanElement> {
   closable?: boolean;
   closeIcon?: React.ReactNode;
   visible?: boolean;
-  onClose?: Function;
+  onClose?: (e: React.MouseEvent<HTMLElement>) => void;
   style?: React.CSSProperties;
   icon?: React.ReactNode;
 }
@@ -36,7 +32,7 @@ export interface TagType
   CheckableTag: typeof CheckableTag;
 }
 
-const InternalTag: React.ForwardRefRenderFunction<unknown, TagProps> = (
+const InternalTag: React.ForwardRefRenderFunction<HTMLSpanElement, TagProps> = (
   {
     prefixCls: customizePrefixCls,
     className,
@@ -87,9 +83,7 @@ const InternalTag: React.ForwardRefRenderFunction<unknown, TagProps> = (
 
   const handleCloseClick = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
-    if (onClose) {
-      onClose(e);
-    }
+    onClose?.(e);
 
     if (e.defaultPrevented) {
       return;
@@ -102,9 +96,9 @@ const InternalTag: React.ForwardRefRenderFunction<unknown, TagProps> = (
   const renderCloseIcon = () => {
     if (closable) {
       return closeIcon ? (
-        <div className={`${prefixCls}-close-icon`} onClick={handleCloseClick}>
+        <span className={`${prefixCls}-close-icon`} onClick={handleCloseClick}>
           {closeIcon}
-        </div>
+        </span>
       ) : (
         <CloseOutlined className={`${prefixCls}-close-icon`} onClick={handleCloseClick} />
       );

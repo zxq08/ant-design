@@ -3,7 +3,7 @@ import Pagination from 'rc-pagination/lib/locale/es_ES';
 import DatePicker from '../date-picker/locale/es_ES';
 import TimePicker from '../time-picker/locale/es_ES';
 import Calendar from '../calendar/locale/es_ES';
-import { Locale } from '../locale-provider';
+import type { Locale } from '../locale-provider';
 
 const typeTemplate = '${label} no es un ${type} válido';
 
@@ -20,9 +20,20 @@ const localeValues: Locale = {
     filterTitle: 'Filtrar menú',
     filterConfirm: 'Aceptar',
     filterReset: 'Reiniciar',
+    filterEmptyText: 'Sin filtros',
+    filterCheckall: 'Seleccionar todo',
+    filterSearchPlaceholder: 'Buscar en filtros',
+    emptyText: 'Sin datos',
     selectAll: 'Seleccionar todo',
     selectInvert: 'Invertir selección',
+    selectNone: 'Vacíe todo',
+    selectionAll: 'Seleccionar todos los datos',
     sortTitle: 'Ordenar',
+    expand: 'Expandir fila',
+    collapse: 'Colapsar fila',
+    triggerDesc: 'Click para ordenar en orden descendente',
+    triggerAsc: 'Click para ordenar en orden ascendente',
+    cancelSort: 'Click para cancelar ordenamiento',
   },
   Modal: {
     okText: 'Aceptar',
@@ -34,9 +45,16 @@ const localeValues: Locale = {
     cancelText: 'Cancelar',
   },
   Transfer: {
+    titles: ['', ''],
     searchPlaceholder: 'Buscar aquí',
     itemUnit: 'elemento',
     itemsUnit: 'elementos',
+    remove: 'Eliminar',
+    selectCurrent: 'Seleccionar página actual',
+    removeCurrent: 'Remover página actual',
+    selectAll: 'Seleccionar todos los datos',
+    removeAll: 'Eliminar todos los datos',
+    selectInvert: 'Invertir página actual',
   },
   Upload: {
     uploading: 'Subiendo...',
@@ -52,15 +70,16 @@ const localeValues: Locale = {
     icon: 'ícono',
   },
   Text: {
-    edit: 'editar',
-    copy: 'copiar',
-    copied: 'copiado',
-    expand: 'expandir',
+    edit: 'Editar',
+    copy: 'Copiar',
+    copied: 'Copiado',
+    expand: 'Expandir',
   },
   PageHeader: {
-    back: 'volver',
+    back: 'Volver',
   },
   Form: {
+    optional: '(opcional)',
     defaultValidateMessages: {
       default: 'Error de validación del campo ${label}',
       required: 'Por favor ingresar ${label}',
@@ -108,6 +127,9 @@ const localeValues: Locale = {
         mismatch: '${label} no coincide con el patrón ${pattern}',
       },
     },
+  },
+  Image: {
+    preview: 'Previsualización',
   },
 };
 

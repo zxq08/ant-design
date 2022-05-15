@@ -4,9 +4,7 @@ import Slider from '..';
 describe('Slider.typescript', () => {
   it('single value', () => {
     const value = 0;
-    function onChange(v: number) {
-      return v;
-    }
+    const onChange = (v: number) => v;
     const result = (
       <Slider defaultValue={value} value={value} onChange={onChange} onAfterChange={onChange} />
     );
@@ -15,9 +13,7 @@ describe('Slider.typescript', () => {
 
   it('range value', () => {
     const value: [number, number] = [0, 1];
-    function onChange(v: [number, number]) {
-      return v;
-    }
+    const onChange = (v: [number, number]) => v;
     const result = (
       <Slider
         range
@@ -25,6 +21,21 @@ describe('Slider.typescript', () => {
         value={value}
         onChange={onChange}
         onAfterChange={onChange}
+      />
+    );
+    expect(result).toBeTruthy();
+  });
+
+  it('step can be null value', () => {
+    const value = 0;
+    const onChange = (v: number) => v;
+    const result = (
+      <Slider
+        defaultValue={value}
+        value={value}
+        onChange={onChange}
+        onAfterChange={onChange}
+        step={null}
       />
     );
     expect(result).toBeTruthy();

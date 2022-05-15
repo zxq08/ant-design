@@ -3,7 +3,7 @@ import Pagination from 'rc-pagination/lib/locale/ja_JP';
 import DatePicker from '../date-picker/locale/ja_JP';
 import TimePicker from '../time-picker/locale/ja_JP';
 import Calendar from '../calendar/locale/ja_JP';
-import { Locale } from '../locale-provider';
+import type { Locale } from '../locale-provider';
 
 const typeTemplate = '${label}は有効な${type}ではありません';
 
@@ -14,11 +14,19 @@ const localeValues: Locale = {
   TimePicker,
   Calendar,
   Table: {
-    filterTitle: 'メニューをフィルター',
+    filterTitle: 'フィルター',
     filterConfirm: 'OK',
     filterReset: 'リセット',
-    selectAll: 'すべてを選択',
-    selectInvert: '選択を反転',
+    filterEmptyText: 'フィルターなし',
+    selectAll: 'ページ単位で選択',
+    selectInvert: 'ページ単位で反転',
+    selectionAll: 'すべてを選択',
+    sortTitle: 'ソート',
+    expand: '展開する',
+    collapse: '折り畳む',
+    triggerDesc: 'クリックで降順にソート',
+    triggerAsc: 'クリックで昇順にソート',
+    cancelSort: 'ソートをキャンセル',
   },
   Modal: {
     okText: 'OK',

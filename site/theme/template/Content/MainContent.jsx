@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'bisheng/router';
+import { Link, browserHistory } from 'bisheng/router';
 import { Row, Col, Menu, Affix, Tooltip, Avatar, Dropdown } from 'antd';
 import { injectIntl } from 'react-intl';
 import { LeftOutlined, RightOutlined, ExportOutlined } from '@ant-design/icons';
@@ -58,12 +58,16 @@ function getSideBarOpenKeys(nextProps) {
   return shouldOpenKeys;
 }
 
-function updateActiveToc(id) {
+function clearActiveToc() {
   [].forEach.call(document.querySelectorAll('.toc-affix li a'), node => {
     node.className = '';
   });
+}
+
+function updateActiveToc(id) {
   const currentNode = document.querySelectorAll(`.toc-affix li a[href="#${id}"]`)[0];
   if (currentNode) {
+    clearActiveToc();
     currentNode.className = 'current';
   }
 }
@@ -76,8 +80,7 @@ class MainContent extends Component {
   };
 
   componentDidMount() {
-    this.componentDidUpdate();
-    window.addEventListener('load', this.handleInitialHashOnLoad);
+    window.addEventListener('load', this.handleLoad);
     window.addEventListener('hashchange', this.handleHashChange);
   }
 
@@ -98,6 +101,7 @@ class MainContent extends Component {
       this.bindScroller();
     }
     if (!window.location.hash && prevLocation.pathname !== location.pathname) {
+      clearActiveToc();
       window.scrollTo(0, 0);
     }
     // when subMenu not equal
@@ -111,7 +115,7 @@ class MainContent extends Component {
     if (this.scroller) {
       this.scroller.destroy();
     }
-    window.removeEventListener('load', this.handleInitialHashOnLoad);
+    window.removeEventListener('load', this.handleLoad);
     window.removeEventListener('hashchange', this.handleHashChange);
     clearTimeout(this.timeout);
   }
@@ -136,7 +140,7 @@ class MainContent extends Component {
         return (
           <Menu.ItemGroup title={menuItem.title} key={menuItem.title}>
             {menuItem.children
-              .sort((a, b) => a.title.charCodeAt(0) - b.title.charCodeAt(0))
+              .sort((a, b) => a.title.localeCompare(b.title))
               .map(leaf => this.generateMenuItem(false, leaf, footerNavIcons))}
           </Menu.ItemGroup>
         );
@@ -188,18 +192,11 @@ class MainContent extends Component {
     this.setState({ openKeys });
   };
 
-  handleInitialHashOnLoad = () => {
-    setTimeout(() => {
-      if (!window.location.hash) {
-        return;
-      }
-      const element = document.getElementById(
-        decodeURIComponent(window.location.hash.replace('#', '')),
-      );
-      if (element && document.documentElement.scrollTop === 0) {
-        element.scrollIntoView();
-      }
-    }, 0);
+  handleLoad = () => {
+    if (window.location.hash) {
+      updateActiveToc(window.location.hash.replace(/^#/, ''));
+    }
+    this.bindScroller();
   };
 
   handleHashChange = () => {
@@ -223,7 +220,7 @@ class MainContent extends Component {
     this.scroller
       .setup({
         step: '.markdown > h2, .code-box', // required
-        offset: 0,
+        offset: '10px',
       })
       .onStepEnter(({ element }) => {
         updateActiveToc(element.id);
@@ -233,6 +230,7 @@ class MainContent extends Component {
   generateMenuItem(isTop, item, { before = null, after = null }) {
     const {
       intl: { locale },
+      location,
     } = this.props;
     const key = fileNameToPath(item.filename);
     if (!item.title) {
@@ -249,11 +247,13 @@ class MainContent extends Component {
         ];
     const { disabled } = item;
     const url = item.filename.replace(/(\/index)?((\.zh-cn)|(\.en-us))?\.md$/i, '').toLowerCase();
+
     const child = !item.link ? (
       <Link
         to={utils.getLocalizedPathname(
           /^components/.test(url) ? `${url}/` : url,
           locale === 'zh-CN',
+          location.query,
         )}
         disabled={disabled}
       >
@@ -315,8 +315,25 @@ class MainContent extends Component {
 
   changeThemeMode = theme => {
     const { setTheme, theme: selectedTheme } = this.context;
+    const { pathname, hash, query } = this.props.location;
     if (selectedTheme !== theme) {
       setTheme(theme);
+      if (theme === 'default') {
+        document.documentElement.style.colorScheme = 'light';
+        setColor(false);
+        delete query.theme;
+      } else {
+        if (theme === 'dark') {
+          document.documentElement.style.colorScheme = 'dark';
+          setColor(true);
+        }
+        query.theme = theme;
+      }
+      browserHistory.push({
+        pathname: `/${pathname}`,
+        query,
+        hash,
+      });
     }
   };
 
@@ -356,13 +373,84 @@ class MainContent extends Component {
   renderMainContent({ theme, setIframeTheme }) {
     const { localizedPageData, demos, location } = this.props;
     if (location.pathname.includes('components/overview')) {
+      const type = utils.isZhCN(location.pathname) ? '重型组件' : 'ProComponents';
       return (
         <ComponentOverview
           {...this.props}
           doc={localizedPageData}
-          componentsData={getModuleData(this.props).filter(
-            ({ meta }) => meta.category === 'Components',
-          )}
+          componentsData={getModuleData(this.props)
+            .filter(({ meta }) => meta.category === 'Components')
+            .concat([
+              {
+                meta: {
+                  category: 'Components',
+                  cover:
+                    'https://gw.alipayobjects.com/zos/antfincdn/4n5H%24UX%24j/bianzu%2525204.svg',
+                  filename: 'https://procomponents.ant.design/components/layout',
+                  subtitle: '高级布局',
+                  title: 'ProLayout',
+                  type,
+                  tag: 'https://gw.alipayobjects.com/zos/antfincdn/OG4ajVYzh/bianzu%2525202.svg',
+                },
+              },
+              {
+                meta: {
+                  category: 'Components',
+                  cover: 'https://gw.alipayobjects.com/zos/antfincdn/mStei5BFC/bianzu%2525207.svg',
+                  filename: 'https://procomponents.ant.design/components/form',
+                  subtitle: '高级表单',
+                  title: 'ProForm',
+                  type,
+                  tag: 'https://gw.alipayobjects.com/zos/antfincdn/OG4ajVYzh/bianzu%2525202.svg',
+                },
+              },
+              {
+                meta: {
+                  category: 'Components',
+                  cover:
+                    'https://gw.alipayobjects.com/zos/antfincdn/AwU0Cv%26Ju/bianzu%2525208.svg',
+                  filename: 'https://procomponents.ant.design/components/table',
+                  subtitle: '高级表格',
+                  title: 'ProTable',
+                  type,
+                  tag: 'https://gw.alipayobjects.com/zos/antfincdn/OG4ajVYzh/bianzu%2525202.svg',
+                },
+              },
+              {
+                meta: {
+                  category: 'Components',
+                  cover:
+                    'https://gw.alipayobjects.com/zos/antfincdn/H0%26LSYYfh/bianzu%2525209.svg',
+                  filename: 'https://procomponents.ant.design/components/descriptions',
+                  subtitle: '高级定义列表',
+                  title: 'ProDescriptions',
+                  type,
+                  tag: 'https://gw.alipayobjects.com/zos/antfincdn/OG4ajVYzh/bianzu%2525202.svg',
+                },
+              },
+              {
+                meta: {
+                  category: 'Components',
+                  cover: 'https://gw.alipayobjects.com/zos/antfincdn/uZUmLtne5/bianzu%2525209.svg',
+                  filename: 'https://procomponents.ant.design/components/list',
+                  subtitle: '高级列表',
+                  title: 'ProList',
+                  type,
+                  tag: 'https://gw.alipayobjects.com/zos/antfincdn/OG4ajVYzh/bianzu%2525202.svg',
+                },
+              },
+              {
+                meta: {
+                  category: 'Components',
+                  cover: 'https://gw.alipayobjects.com/zos/antfincdn/N3eU432oA/bianzu%2525209.svg',
+                  filename: 'https://procomponents.ant.design/components/editable-table',
+                  subtitle: '可编辑表格',
+                  title: 'EditableProTable',
+                  type,
+                  tag: 'https://gw.alipayobjects.com/zos/antfincdn/OG4ajVYzh/bianzu%2525202.svg',
+                },
+              },
+            ])}
         />
       );
     }
@@ -435,13 +523,13 @@ class MainContent extends Component {
             </section>
             {componentPage && (
               <div className="fixed-widgets">
-                <Dropdown overlay={this.getThemeSwitchMenu()} placement="topCenter">
+                <Dropdown overlay={this.getThemeSwitchMenu()} placement="top">
                   <Avatar className="fixed-widgets-avatar" size={44} icon={<ThemeIcon />} />
                 </Dropdown>
               </div>
             )}
             <PrevAndNext prev={prev} next={next} />
-            <Footer />
+            <Footer location={location} />
           </Col>
         </Row>
       </div>

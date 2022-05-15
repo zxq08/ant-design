@@ -5,7 +5,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
 import LZString from 'lz-string';
-import { Tooltip, Alert } from 'antd';
+import { Tooltip, Alert, Badge } from 'antd';
 import { SnippetsOutlined, CheckOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import stackblitzSdk from '@stackblitz/sdk';
 import CodePreview from './CodePreview';
@@ -48,13 +48,14 @@ class Demo extends React.Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     const { codeExpand, copied, copyTooltipVisible } = this.state;
-    const { expand, theme, showRiddleButton } = this.props;
+    const { expand, theme, showRiddleButton, react18 } = this.props;
     return (
       (codeExpand || expand) !== (nextState.codeExpand || nextProps.expand) ||
       copied !== nextState.copied ||
       copyTooltipVisible !== nextState.copyTooltipVisible ||
       nextProps.theme !== theme ||
-      nextProps.showRiddleButton !== showRiddleButton
+      nextProps.showRiddleButton !== showRiddleButton ||
+      nextProps.react18 !== react18
     );
   }
 
@@ -136,6 +137,7 @@ class Demo extends React.Component {
       intl: { locale },
       theme,
       showRiddleButton,
+      react18,
     } = props;
     const { copied, copyTooltipVisible } = state;
     if (!this.liveDemo) {
@@ -163,12 +165,11 @@ class Demo extends React.Component {
     const localizeIntro = content[locale] || content;
     const introChildren = utils.toReactComponent(['div'].concat(localizeIntro));
 
-    const highlightClass = classNames({
-      'highlight-wrapper': true,
+    const highlightClass = classNames('highlight-wrapper', {
       'highlight-wrapper-expand': codeExpand,
     });
 
-    const prefillStyle = `@import 'antd/dist/antd.css';\n\n${style || ''}`.replace(
+    const prefillStyle = `@import '~antd/dist/antd.css';\n\n${style || ''}`.replace(
       new RegExp(`#${meta.id}\\s*`, 'g'),
       '',
     );
@@ -187,42 +188,6 @@ class Demo extends React.Component {
 
     const sourceCode = this.getSourceCode();
 
-    const codepenPrefillConfig = {
-      title: `${localizedTitle} - Ant Design Demo`,
-      html,
-      js: sourceCode
-        .replace(/import\s+{(\s+[^}]*\s+)}\s+from\s+'antd';/, 'const { $1 } = antd;')
-        .replace(/import\s+{(\s+[^}]*\s+)}\s+from\s+'@ant-design\/icons';/, 'const { $1 } = icons;')
-        .replace("import moment from 'moment';", '')
-        .replace(/import\s+{\s+(.*)\s+}\s+from\s+'react-router';/, 'const { $1 } = ReactRouter;')
-        .replace(
-          /import\s+{\s+(.*)\s+}\s+from\s+'react-router-dom';/,
-          'const { $1 } = ReactRouterDOM;',
-        )
-        .replace(/([A-Za-z]*)\s+as\s+([A-Za-z]*)/, '$1:$2'),
-      css: prefillStyle,
-      editors: '001',
-      // eslint-disable-next-line no-undef
-      css_external: `https://unpkg.com/antd@${antdReproduceVersion}/dist/antd.css`,
-      js_external: [
-        'react@16.x/umd/react.development.js',
-        'react-dom@16.x/umd/react-dom.development.js',
-        'moment/min/moment-with-locales.js',
-        // eslint-disable-next-line no-undef
-        `antd@${antdReproduceVersion}/dist/antd-with-locales.js`,
-        `@ant-design/icons/dist/index.umd.js`,
-        'react-router-dom/umd/react-router-dom.min.js',
-        'react-router@3.x/umd/ReactRouter.min.js',
-      ]
-        .map(url => `https://unpkg.com/${url}`)
-        .join(';'),
-      js_pre_processor: 'typescript',
-    };
-    const riddlePrefillConfig = {
-      title: `${localizedTitle} - Ant Design Demo`,
-      js: sourceCode,
-      css: prefillStyle,
-    };
     const dependencies = sourceCode.split('\n').reduce(
       (acc, line) => {
         const matches = line.match(/import .+? from '(.+)';$/);
@@ -241,6 +206,70 @@ class Demo extends React.Component {
     );
 
     dependencies['@ant-design/icons'] = 'latest';
+    dependencies.react = react18 ? '^18.0.0' : '^17.0.0';
+    dependencies['react-dom'] = react18 ? '^18.0.0' : '^17.0.0';
+
+    const codepenPrefillConfig = {
+      title: `${localizedTitle} - antd@${dependencies.antd}`,
+      html,
+      js: `${react18 ? 'const { createRoot } = ReactDOM;\n' : ''}${sourceCode
+        .replace(/import\s+(?:React,\s+)?{(\s+[^}]*\s+)}\s+from\s+'react'/, `const { $1 } = React;`)
+        .replace(/import\s+{(\s+[^}]*\s+)}\s+from\s+'antd';/, 'const { $1 } = antd;')
+        .replace(/import\s+{(\s+[^}]*\s+)}\s+from\s+'@ant-design\/icons';/, 'const { $1 } = icons;')
+        .replace("import moment from 'moment';", '')
+        .replace(/import\s+{\s+(.*)\s+}\s+from\s+'react-router';/, 'const { $1 } = ReactRouter;')
+        .replace(
+          /import\s+{\s+(.*)\s+}\s+from\s+'react-router-dom';/,
+          'const { $1 } = ReactRouterDOM;',
+        )
+        .replace(/([A-Za-z]*)\s+as\s+([A-Za-z]*)/, '$1:$2')
+        .replace(/export default/, 'const ComponentDemo =')}\n\n${
+        react18
+          ? 'createRoot(mountNode).render(<ComponentDemo />)'
+          : 'ReactDOM.render(<ComponentDemo />, mountNode)'
+      };\n`,
+      css: prefillStyle,
+      editors: '001',
+      // eslint-disable-next-line no-undef
+      css_external: `https://unpkg.com/antd@${antdReproduceVersion}/dist/antd.css`,
+      js_external: [
+        react18 ? 'react@18/umd/react.development.js' : 'react@16.x/umd/react.development.js',
+        react18
+          ? 'react-dom@18/umd/react-dom.development.js'
+          : 'react-dom@16.x/umd/react-dom.development.js',
+        'moment/min/moment-with-locales.js',
+        // eslint-disable-next-line no-undef
+        `antd@${antdReproduceVersion}/dist/antd-with-locales.js`,
+        `@ant-design/icons/dist/index.umd.js`,
+        'react-router-dom/umd/react-router-dom.min.js',
+        'react-router@3.x/umd/ReactRouter.min.js',
+      ]
+        .map(url => `https://unpkg.com/${url}`)
+        .join(';'),
+      js_pre_processor: 'typescript',
+    };
+
+    const riddlePrefillConfig = {
+      title: `${localizedTitle} - antd@${dependencies.antd}`,
+      js: `${
+        react18
+          ? `import React from 'react';\nimport { createRoot } from 'react-dom/client';\n`
+          : ''
+      }${sourceCode.replace(/export default/, 'const ComponentDemo =')}\n\n${
+        react18
+          ? 'createRoot(mountNode).render(<ComponentDemo />)'
+          : 'ReactDOM.render(<ComponentDemo />, mountNode)'
+      };\n`,
+      css: prefillStyle,
+      json: JSON.stringify(
+        {
+          name: 'antd-demo',
+          dependencies,
+        },
+        null,
+        2,
+      ),
+    };
 
     // Reorder source code
     let parsedSourceCode = sourceCode;
@@ -253,12 +282,11 @@ class Demo extends React.Component {
       parsedSourceCode = parsedSourceCode.replace(importReactReg, '').trim();
     }
 
-    const indexJsContent = `
+    const demoJsContent = `
 ${importReactContent}
-import ReactDOM from 'react-dom';
 import 'antd/dist/antd.css';
 import './index.css';
-${parsedSourceCode.replace('mountNode', "document.getElementById('container')")}
+${parsedSourceCode}
 `.trim();
     const indexCssContent = (style || '')
       .trim()
@@ -266,18 +294,33 @@ ${parsedSourceCode.replace('mountNode', "document.getElementById('container')")}
       .replace('</style>', '')
       .replace('<style>', '');
 
+    const indexJsContent = react18
+      ? `
+${importReactContent}
+import { createRoot } from 'react-dom/client';
+import Demo from './demo';
+
+createRoot(document.getElementById('container')).render(<Demo />);
+`
+      : `
+${importReactContent}
+import ReactDOM from 'react-dom';
+import Demo from './demo';
+
+ReactDOM.render(<Demo />, document.getElementById('container'));
+`;
+
     const codesandboxPackage = {
-      name: `${localizedTitle} - Ant Design Demo`,
-      version: '1.0.0',
+      title: `${localizedTitle} - antd@${dependencies.antd}`,
       main: 'index.js',
       dependencies: {
         ...dependencies,
-        react: '^16.12.0',
-        'react-dom': '^16.12.0',
-        'react-scripts': '^3.0.1',
+        react: react18 ? '^18.0.0' : '^16.14.0',
+        'react-dom': react18 ? '^18.0.0' : '^16.14.0',
+        'react-scripts': '^4.0.0',
       },
       devDependencies: {
-        typescript: '^3.8.2',
+        typescript: '^4.0.5',
       },
       scripts: {
         start: 'react-scripts start',
@@ -292,25 +335,30 @@ ${parsedSourceCode.replace('mountNode', "document.getElementById('container')")}
         'package.json': { content: codesandboxPackage },
         'index.css': { content: indexCssContent },
         'index.js': { content: indexJsContent },
+        'demo.js': { content: demoJsContent },
         'index.html': {
           content: html,
         },
       },
     };
     const stackblitzPrefillConfig = {
-      title: `${localizedTitle} - Ant Design Demo`,
+      title: `${localizedTitle} - antd@${dependencies.antd}`,
       template: 'create-react-app',
       dependencies,
       files: {
         'index.css': indexCssContent,
         'index.js': indexJsContent,
+        'demo.js': demoJsContent,
         'index.html': html,
       },
     };
-    return (
+
+    let codeBox = (
       <section className={codeBoxClass} id={meta.id}>
         <section className="code-box-demo">
-          <ErrorBoundary>{this.liveDemo}</ErrorBoundary>
+          <ErrorBoundary>
+            <React.StrictMode>{this.liveDemo}</React.StrictMode>
+          </ErrorBoundary>
           {style ? <style dangerouslySetInnerHTML={{ __html: style }} /> : null}
         </section>
         <section className="code-box-meta markdown">
@@ -418,7 +466,7 @@ ${parsedSourceCode.replace('mountNode', "document.getElementById('container')")}
                   src={
                     theme === 'dark'
                       ? 'https://gw.alipayobjects.com/zos/antfincdn/btT3qDZn1U/wSAkBuJFbdxsosKKpqyq.svg'
-                      : 'https://gw.alipayobjects.com/zos/rmsportal/wSAkBuJFbdxsosKKpqyq.svg'
+                      : 'https://gw.alipayobjects.com/zos/antfincdn/Z5c7kzvi30/expand.svg'
                   }
                   className={codeExpand ? 'code-expand-icon-hide' : 'code-expand-icon-show'}
                   onClick={() => this.handleCodeExpand(meta.id)}
@@ -428,7 +476,7 @@ ${parsedSourceCode.replace('mountNode', "document.getElementById('container')")}
                   src={
                     theme === 'dark'
                       ? 'https://gw.alipayobjects.com/zos/antfincdn/CjZPwcKUG3/OpROPHYqWmrMDBFMZtKF.svg'
-                      : 'https://gw.alipayobjects.com/zos/rmsportal/OpROPHYqWmrMDBFMZtKF.svg'
+                      : 'https://gw.alipayobjects.com/zos/antfincdn/4zAaozCvUH/unexpand.svg'
                   }
                   className={codeExpand ? 'code-expand-icon-show' : 'code-expand-icon-hide'}
                   onClick={() => this.handleCodeExpand(meta.id)}
@@ -449,6 +497,12 @@ ${parsedSourceCode.replace('mountNode', "document.getElementById('container')")}
         </section>
       </section>
     );
+
+    if (meta.version) {
+      codeBox = <Badge.Ribbon text={meta.version}>{codeBox}</Badge.Ribbon>;
+    }
+
+    return codeBox;
   }
 }
 

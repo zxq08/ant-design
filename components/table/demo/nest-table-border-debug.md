@@ -15,62 +15,55 @@ debug: true
 To see if bordered style applied to other tables.
 
 ```jsx
-import { Table, Badge, Menu, Dropdown, Switch, Form } from 'antd';
+import { Table, Badge, Menu, Dropdown, Switch, Form, Space } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 
-const menu = (
-  <Menu>
-    <Menu.Item>Action 1</Menu.Item>
-    <Menu.Item>Action 2</Menu.Item>
-  </Menu>
-);
+const menu = <Menu items={[{ label: 'Action 1' }, { label: 'Action 2' }]} />;
 
 function NestedTable() {
-  const createExpandedRowRender = bordered => {
-    return () => {
-      const columns = [
-        { title: 'Date', dataIndex: 'date', key: 'date' },
-        { title: 'Name', dataIndex: 'name', key: 'name' },
-        {
-          title: 'Status',
-          key: 'state',
-          render: () => (
-            <span>
-              <Badge status="success" />
-              Finished
-            </span>
-          ),
-        },
-        { title: 'Upgrade Status', dataIndex: 'upgradeNum', key: 'upgradeNum' },
-        {
-          title: 'Action',
-          dataIndex: 'operation',
-          key: 'operation',
-          render: () => (
-            <span className="table-operation">
-              <a>Pause</a>
-              <a>Stop</a>
-              <Dropdown overlay={menu}>
-                <a>
-                  More <DownOutlined />
-                </a>
-              </Dropdown>
-            </span>
-          ),
-        },
-      ];
+  const createExpandedRowRender = bordered => () => {
+    const columns = [
+      { title: 'Date', dataIndex: 'date', key: 'date' },
+      { title: 'Name', dataIndex: 'name', key: 'name' },
+      {
+        title: 'Status',
+        key: 'state',
+        render: () => (
+          <span>
+            <Badge status="success" />
+            Finished
+          </span>
+        ),
+      },
+      { title: 'Upgrade Status', dataIndex: 'upgradeNum', key: 'upgradeNum' },
+      {
+        title: 'Action',
+        dataIndex: 'operation',
+        key: 'operation',
+        render: () => (
+          <Space size="middle">
+            <a>Pause</a>
+            <a>Stop</a>
+            <Dropdown overlay={menu}>
+              <a>
+                More <DownOutlined />
+              </a>
+            </Dropdown>
+          </Space>
+        ),
+      },
+    ];
 
-      const data = [];
-      for (let i = 0; i < 3; ++i) {
-        data.push({
-          key: i,
-          date: '2014-12-24 23:12:00',
-          name: 'This is production name',
-          upgradeNum: 'Upgraded: 56',
-        });
-      }
-      return <Table columns={columns} dataSource={data} pagination={false} bordered={bordered} />;
-    };
+    const data = [];
+    for (let i = 0; i < 3; ++i) {
+      data.push({
+        key: i,
+        date: '2014-12-24 23:12:00',
+        name: 'This is production name',
+        upgradeNum: 'Upgraded: 56',
+      });
+    }
+    return <Table columns={columns} dataSource={data} pagination={false} bordered={bordered} />;
   };
 
   const columns = [
@@ -125,5 +118,5 @@ function NestedTable() {
   );
 }
 
-ReactDOM.render(<NestedTable />, mountNode);
+export default () => <NestedTable />;
 ```

@@ -1,32 +1,21 @@
 import React from 'react';
-import { mount } from 'enzyme';
-import raf from 'raf';
 import { act } from 'react-dom/test-utils';
 import Form from '..';
 import Input from '../../input';
 import Button from '../../button';
-import { sleep } from '../../../tests/utils';
-
-jest.mock('raf');
+import { sleep, render, fireEvent } from '../../../tests/utils';
 
 describe('Form.List', () => {
-  raf.mockImplementation(callback => window.setTimeout(callback));
-
-  afterAll(() => {
-    raf.mockRestore();
-  });
-
   async function change(wrapper, index, value) {
-    wrapper.find(Input).at(index).simulate('change', { target: { value } });
+    fireEvent.change(wrapper.getElementsByClassName('ant-input')[index], { target: { value } });
     await sleep();
-    wrapper.update();
   }
 
   function testList(name, renderField) {
     it(name, async () => {
       jest.useFakeTimers();
 
-      const wrapper = mount(
+      const { container } = render(
         <Form>
           <Form.List name="list">
             {(fields, { add, remove }) => (
@@ -55,35 +44,35 @@ describe('Form.List', () => {
 
       function operate(className) {
         act(() => {
-          wrapper.find(className).last().simulate('click');
+          fireEvent.click(container.querySelector(className));
           jest.runAllTimers();
         });
-        wrapper.update();
       }
 
       operate('.add');
-      expect(wrapper.find(Input).length).toBe(1);
+      expect(container.getElementsByClassName('ant-input').length).toBe(1);
 
       operate('.add');
-      expect(wrapper.find(Input).length).toBe(2);
+      expect(container.getElementsByClassName('ant-input').length).toBe(2);
 
       operate('.add');
-      expect(wrapper.find(Input).length).toBe(3);
+      expect(container.getElementsByClassName('ant-input').length).toBe(3);
 
-      await change(wrapper, 2, '');
-      act(() => {
-        jest.runAllTimers();
-      });
-      wrapper.update();
-      expect(wrapper.find('.ant-form-item-explain div').length).toBe(1);
+      await change(container, 2, '');
+      for (let i = 0; i < 10; i += 1) {
+        act(() => {
+          jest.runAllTimers();
+        });
+      }
+      expect(container.getElementsByClassName('ant-form-item-explain').length).toBe(1);
 
       operate('.remove-0');
-      expect(wrapper.find(Input).length).toBe(2);
-      expect(wrapper.find('.ant-form-item-explain div').length).toBe(1);
+      expect(container.getElementsByClassName('ant-input').length).toBe(2);
+      expect(container.getElementsByClassName('ant-form-item-explain').length).toBe(1);
 
       operate('.remove-1');
-      expect(wrapper.find(Input).length).toBe(1);
-      expect(wrapper.find('.ant-form-item-explain div').length).toBe(0);
+      expect(container.getElementsByClassName('ant-input').length).toBe(1);
+      expect(container.getElementsByClassName('ant-form-item-explain').length).toBe(0);
 
       jest.useRealTimers();
     });
@@ -95,6 +84,7 @@ describe('Form.List', () => {
     </Form.Item>
   ));
 
+  // FIXME: @zombieJ React 18 StrictMode
   testList('nest noStyle', field => (
     <Form.Item key={field.key}>
       <Form.Item noStyle {...field} rules={[{ required: true }]}>
@@ -105,14 +95,12 @@ describe('Form.List', () => {
 
   it('correct onFinish values', async () => {
     async function click(wrapper, className) {
-      wrapper.find(className).last().simulate('click');
-      await sleep();
-      wrapper.update();
+      fireEvent.click(wrapper.querySelector(className));
     }
 
     const onFinish = jest.fn().mockImplementation(() => {});
 
-    const wrapper = mount(
+    const { container } = render(
       <Form
         onFinish={v => {
           if (typeof v.list[0] === 'object') {
@@ -145,23 +133,119 @@ describe('Form.List', () => {
       </Form>,
     );
 
-    await click(wrapper, '.add');
-    await change(wrapper, 0, 'input1');
-    wrapper.find('form').simulate('submit');
+    await click(container, '.add');
+    await change(container, 0, 'input1');
+    fireEvent.submit(container.querySelector('form'));
     await sleep();
     expect(onFinish).toHaveBeenLastCalledWith({ list: ['input1'] });
 
-    await click(wrapper, '.add');
-    await change(wrapper, 1, 'input2');
-    await click(wrapper, '.add');
-    await change(wrapper, 2, 'input3');
-    wrapper.find('form').simulate('submit');
+    await click(container, '.add');
+    await change(container, 1, 'input2');
+    await click(container, '.add');
+    await change(container, 2, 'input3');
+    fireEvent.submit(container.querySelector('form'));
     await sleep();
     expect(onFinish).toHaveBeenLastCalledWith({ list: ['input1', 'input2', 'input3'] });
 
-    await click(wrapper, '.remove'); // will remove first input
-    wrapper.find('form').simulate('submit');
+    await click(container, '.remove'); // will remove first input
+    fireEvent.submit(container.querySelector('form'));
     await sleep();
     expect(onFinish).toHaveBeenLastCalledWith({ list: ['input2', 'input3'] });
+  });
+
+  it('list errors', async () => {
+    jest.useFakeTimers();
+
+    let operation;
+    const { container } = render(
+      <Form>
+        <Form.List
+          name="list"
+          rules={[
+            {
+              validator: async (_, value) => {
+                if (value.length < 2) {
+                  return Promise.reject(new Error('At least 2'));
+                }
+              },
+            },
+          ]}
+        >
+          {(_, opt, { errors }) => {
+            operation = opt;
+            return <Form.ErrorList errors={errors} />;
+          }}
+        </Form.List>
+      </Form>,
+    );
+
+    async function addItem() {
+      await act(async () => {
+        operation.add();
+        await sleep(100);
+        jest.runAllTimers();
+      });
+    }
+
+    await addItem();
+    expect(container.querySelector('.ant-form-item-explain div').innerHTML).toEqual('At least 2');
+
+    await addItem();
+    expect(container.getElementsByClassName('ant-form-item-explain div')).toHaveLength(0);
+
+    jest.useRealTimers();
+  });
+
+  it('should render empty without errors', () => {
+    const { container } = render(<Form.ErrorList />);
+    expect(container.firstChild).toMatchSnapshot();
+  });
+
+  it('no warning when reset in validate', async () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    const Demo = () => {
+      const [form] = Form.useForm();
+
+      React.useEffect(() => {
+        form.setFieldsValue({
+          list: [1],
+        });
+      }, []);
+
+      return (
+        <Form form={form}>
+          <Form.List name="list">
+            {fields =>
+              fields.map(field => (
+                <Form.Item key={field.key} {...field}>
+                  <Input />
+                </Form.Item>
+              ))
+            }
+          </Form.List>
+          <button
+            id="validate"
+            type="button"
+            onClick={() => {
+              form.validateFields().then(() => {
+                form.resetFields();
+              });
+            }}
+          >
+            Validate
+          </button>
+        </Form>
+      );
+    };
+
+    const { container } = render(<Demo />);
+    fireEvent.click(container.querySelector('button'));
+
+    await sleep();
+
+    expect(errorSpy).not.toHaveBeenCalled();
+
+    errorSpy.mockRestore();
   });
 });

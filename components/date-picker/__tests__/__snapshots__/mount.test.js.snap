@@ -25,7 +25,6 @@ exports[`mount rtl render component should be rendered correctly in RTL directio
       >
         <svg
           aria-hidden="true"
-          class=""
           data-icon="calendar"
           fill="currentColor"
           focusable="false"
@@ -68,7 +67,6 @@ exports[`mount rtl render component should be rendered correctly in RTL directio
       >
         <svg
           aria-hidden="true"
-          class=""
           data-icon="calendar"
           fill="currentColor"
           focusable="false"
@@ -111,7 +109,6 @@ exports[`mount rtl render component should be rendered correctly in RTL directio
       >
         <svg
           aria-hidden="true"
-          class=""
           data-icon="calendar"
           fill="currentColor"
           focusable="false"
@@ -158,7 +155,6 @@ exports[`mount rtl render component should be rendered correctly in RTL directio
       >
         <svg
           aria-hidden="true"
-          class=""
           data-icon="swap-right"
           fill="currentColor"
           focusable="false"
@@ -186,7 +182,7 @@ exports[`mount rtl render component should be rendered correctly in RTL directio
   </div>
   <div
     class="ant-picker-active-bar"
-    style="right:0;width:0;position:absolute"
+    style="right: 0px; width: 0px; position: absolute;"
   />
   <span
     class="ant-picker-suffix"
@@ -198,7 +194,6 @@ exports[`mount rtl render component should be rendered correctly in RTL directio
     >
       <svg
         aria-hidden="true"
-        class=""
         data-icon="calendar"
         fill="currentColor"
         focusable="false"

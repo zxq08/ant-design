@@ -2,16 +2,20 @@
 import * as React from 'react';
 import classNames from 'classnames';
 import toArray from 'rc-util/lib/Children/toArray';
-import ResponsiveObserve, {
-  Breakpoint,
-  ScreenMap,
-  responsiveArray,
-} from '../_util/responsiveObserve';
-import devWarning from '../_util/devWarning';
+import type { Breakpoint, ScreenMap } from '../_util/responsiveObserve';
+import ResponsiveObserve, { responsiveArray } from '../_util/responsiveObserve';
+import warning from '../_util/warning';
 import { ConfigContext } from '../config-provider';
 import Row from './Row';
 import DescriptionsItem from './Item';
 import { cloneElement } from '../_util/reactNode';
+
+export interface DescriptionsContextProps {
+  labelStyle?: React.CSSProperties;
+  contentStyle?: React.CSSProperties;
+}
+
+export const DescriptionsContext = React.createContext<DescriptionsContextProps>({});
 
 const DEFAULT_COLUMN_MAP: Record<Breakpoint, number> = {
   xxl: 3,
@@ -50,7 +54,7 @@ function getFilledItem(
     clone = cloneElement(node, {
       span: rowRestCol,
     });
-    devWarning(
+    warning(
       span === undefined,
       'Descriptions',
       'Sum of column `span` in a line not match `column` of Descriptions.',
@@ -104,6 +108,8 @@ export interface DescriptionsProps {
   column?: number | Partial<Record<Breakpoint, number>>;
   layout?: 'horizontal' | 'vertical';
   colon?: boolean;
+  labelStyle?: React.CSSProperties;
+  contentStyle?: React.CSSProperties;
 }
 
 function Descriptions({
@@ -118,6 +124,8 @@ function Descriptions({
   className,
   style,
   size,
+  labelStyle,
+  contentStyle,
 }: DescriptionsProps) {
   const { getPrefixCls, direction } = React.useContext(ConfigContext);
   const prefixCls = getPrefixCls('descriptions', customizePrefixCls);
@@ -140,41 +148,51 @@ function Descriptions({
 
   // Children
   const rows = getRows(children, mergedColumn);
+  const contextValue = React.useMemo(
+    () => ({ labelStyle, contentStyle }),
+    [labelStyle, contentStyle],
+  );
 
   return (
-    <div
-      className={classNames(prefixCls, className, {
-        [`${prefixCls}-${size}`]: size && size !== 'default',
-        [`${prefixCls}-bordered`]: !!bordered,
-        [`${prefixCls}-rtl`]: direction === 'rtl',
-      })}
-      style={style}
-    >
-      {(title || extra) && (
-        <div className={`${prefixCls}-header`}>
-          {title && <div className={`${prefixCls}-title`}>{title}</div>}
-          {extra && <div className={`${prefixCls}-extra`}>{extra}</div>}
-        </div>
-      )}
+    <DescriptionsContext.Provider value={contextValue}>
+      <div
+        className={classNames(
+          prefixCls,
+          {
+            [`${prefixCls}-${size}`]: size && size !== 'default',
+            [`${prefixCls}-bordered`]: !!bordered,
+            [`${prefixCls}-rtl`]: direction === 'rtl',
+          },
+          className,
+        )}
+        style={style}
+      >
+        {(title || extra) && (
+          <div className={`${prefixCls}-header`}>
+            {title && <div className={`${prefixCls}-title`}>{title}</div>}
+            {extra && <div className={`${prefixCls}-extra`}>{extra}</div>}
+          </div>
+        )}
 
-      <div className={`${prefixCls}-view`}>
-        <table>
-          <tbody>
-            {rows.map((row, index) => (
-              <Row
-                key={index}
-                index={index}
-                colon={colon}
-                prefixCls={prefixCls}
-                vertical={layout === 'vertical'}
-                bordered={bordered}
-                row={row}
-              />
-            ))}
-          </tbody>
-        </table>
+        <div className={`${prefixCls}-view`}>
+          <table>
+            <tbody>
+              {rows.map((row, index) => (
+                <Row
+                  key={index}
+                  index={index}
+                  colon={colon}
+                  prefixCls={prefixCls}
+                  vertical={layout === 'vertical'}
+                  bordered={bordered}
+                  row={row}
+                />
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </DescriptionsContext.Provider>
   );
 }
 

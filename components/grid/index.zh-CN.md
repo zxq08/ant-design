@@ -12,52 +12,7 @@ cover: https://gw.alipayobjects.com/zos/alicdn/5rWLU27so/Grid.svg
 ## 设计理念
 
 <div class="grid-demo">
-<div class="ant-row demo-row">
-  <div class="ant-col-24 demo-col demo-col-1">
-    100%
-  </div>
-</div>
-<div class="ant-row demo-row">
-  <div class="ant-col-6 demo-col demo-col-2">
-    25%
-  </div>
-  <div class="ant-col-6 demo-col demo-col-3">
-    25%
-  </div>
-  <div class="ant-col-6 demo-col demo-col-2">
-    25%
-  </div>
-  <div class="ant-col-6 demo-col demo-col-3">
-    25%
-  </div>
-</div>
-<div class="ant-row demo-row">
-  <div class="ant-col-8 demo-col demo-col-4">
-    33.33%
-  </div>
-  <div class="ant-col-8 demo-col demo-col-5">
-    33.33%
-  </div>
-  <div class="ant-col-8 demo-col demo-col-4">
-    33.33%
-  </div>
-</div>
-<div class="ant-row demo-row">
-  <div class="ant-col-12 demo-col demo-col-1">
-    50%
-  </div>
-  <div class="ant-col-12 demo-col demo-col-3">
-    50%
-  </div>
-</div>
-<div class="ant-row demo-row">
-  <div class="ant-col-16 demo-col demo-col-4">
-    66.66%
-  </div>
-  <div class="ant-col-8 demo-col demo-col-5">
-    33.33%
-  </div>
-</div>
+  <img src="https://gw.alipayobjects.com/zos/bmw-prod/9189c9ef-c601-40dc-9960-c11dbb681888.svg" alt="grid design" />
 </div>
 
 在多数业务情况下，Ant Design 需要在设计区域内解决大量信息收纳的问题，因此在 12 栅格系统的基础上，我们将整个设计建议区域按照 24 等分的原则进行划分。
@@ -68,10 +23,10 @@ cover: https://gw.alipayobjects.com/zos/alicdn/5rWLU27so/Grid.svg
 
 布局的栅格化系统，我们是基于行（row）和列（col）来定义信息区块的外部框架，以保证页面的每个区域能够稳健地排布起来。下面简单介绍一下它的工作原理：
 
-- 通过 `row` 在水平方向建立一组 `column`（简写 col）
-- 你的内容应当放置于 `col` 内，并且，只有 `col` 可以作为 `row` 的直接元素
-- 栅格系统中的列是指 1 到 24 的值来表示其跨越的范围。例如，三个等宽的列可以使用 `<Col span={8} />` 来创建
-- 如果一个 `row` 中的 `col` 总和超过 24，那么多余的 `col` 会作为一个整体另起一行排列
+- 通过 `row` 在水平方向建立一组 `column`（简写 col）。
+- 你的内容应当放置于 `col` 内，并且，只有 `col` 可以作为 `row` 的直接元素。
+- 栅格系统中的列是指 1 到 24 的值来表示其跨越的范围。例如，三个等宽的列可以使用 `<Col span={8} />` 来创建。
+- 如果一个 `row` 中的 `col` 总和超过 24，那么多余的 `col` 会作为一个整体另起一行排列。
 
 我们的栅格化系统基于 Flex 布局，允许子元素在父节点内的水平对齐方式 - 居左、居中、居右、等宽排列、分散排列。子元素与子元素之间，支持顶部对齐、垂直居中对齐、底部对齐的方式。同时，支持使用 order 来定义元素的排列顺序。
 
@@ -89,8 +44,9 @@ Ant Design 的布局组件若不能满足你的需求，你也可以直接使用
 | 成员 | 说明 | 类型 | 默认值 | 版本 |
 | --- | --- | --- | --- | --- |
 | align | 垂直对齐方式 | `top` \| `middle` \| `bottom` | `top` |  |
-| gutter | 栅格间隔，可以写成像素值或支持响应式的对象写法来设置水平间隔 `{ xs: 8, sm: 16, md: 24}`。或者使用数组形式同时设置 `[水平间距, 垂直间距]`。 | number \| object \| array | 0 |  |
-| justify | 水平排列方式 | `start` \| `end` \| `center` \| `space-around` \| `space-between` | `start` |  |
+| gutter | 栅格间隔，可以写成像素值或支持响应式的对象写法来设置水平间隔 { xs: 8, sm: 16, md: 24}。或者使用数组形式同时设置 `[水平间距, 垂直间距]` | number \| object \| array | 0 |  |
+| justify | 水平排列方式 | `start` \| `end` \| `center` \| `space-around` \| `space-between` \| `space-evenly` | `start` |  |
+| wrap | 是否自动换行 | boolean | true | 4.8.0 |
 
 ### Col
 

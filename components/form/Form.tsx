@@ -1,36 +1,42 @@
 import * as React from 'react';
+import { useMemo } from 'react';
 import classNames from 'classnames';
-import FieldForm, { List } from 'rc-field-form';
-import { FormProps as RcFormProps } from 'rc-field-form/lib/Form';
-import { ValidateErrorEntity } from 'rc-field-form/lib/interface';
-import { ColProps } from '../grid/col';
-import { ConfigContext, ConfigConsumerProps } from '../config-provider';
+import FieldForm, { List, useWatch } from 'rc-field-form';
+import type { FormProps as RcFormProps } from 'rc-field-form/lib/Form';
+import type { ValidateErrorEntity } from 'rc-field-form/lib/interface';
+import type { Options } from 'scroll-into-view-if-needed';
+import type { ColProps } from '../grid/col';
+import { ConfigContext } from '../config-provider';
+import type { FormContextProps } from './context';
 import { FormContext } from './context';
-import { FormLabelAlign } from './interface';
+import type { FormLabelAlign } from './interface';
 import useForm, { FormInstance } from './hooks/useForm';
-import SizeContext, { SizeType, SizeContextProvider } from '../config-provider/SizeContext';
+import type { SizeType } from '../config-provider/SizeContext';
+import SizeContext, { SizeContextProvider } from '../config-provider/SizeContext';
 
+export type RequiredMark = boolean | 'optional';
 export type FormLayout = 'horizontal' | 'inline' | 'vertical';
 
-export interface FormProps extends Omit<RcFormProps, 'form'> {
+export interface FormProps<Values = any> extends Omit<RcFormProps<Values>, 'form'> {
   prefixCls?: string;
-  hideRequiredMark?: boolean;
   colon?: boolean;
   name?: string;
   layout?: FormLayout;
   labelAlign?: FormLabelAlign;
+  labelWrap?: boolean;
   labelCol?: ColProps;
   wrapperCol?: ColProps;
-  form?: FormInstance;
+  form?: FormInstance<Values>;
   size?: SizeType;
-  scrollToFirstError?: boolean;
+  scrollToFirstError?: Options | boolean;
+  requiredMark?: RequiredMark;
+  /** @deprecated Will warning in future branch. Pls use `requiredMark` instead. */
+  hideRequiredMark?: boolean;
 }
 
-const InternalForm: React.ForwardRefRenderFunction<unknown, FormProps> = (props, ref) => {
+const InternalForm: React.ForwardRefRenderFunction<FormInstance, FormProps> = (props, ref) => {
   const contextSize = React.useContext(SizeContext);
-  const { getPrefixCls, direction }: ConfigConsumerProps = React.useContext(ConfigContext);
-
-  const { name } = props;
+  const { getPrefixCls, direction, form: contextForm } = React.useContext(ConfigContext);
 
   const {
     prefixCls: customizePrefixCls,
@@ -39,14 +45,35 @@ const InternalForm: React.ForwardRefRenderFunction<unknown, FormProps> = (props,
     form,
     colon,
     labelAlign,
+    labelWrap,
     labelCol,
     wrapperCol,
     hideRequiredMark,
     layout = 'horizontal',
     scrollToFirstError,
+    requiredMark,
     onFinishFailed,
+    name,
     ...restFormProps
   } = props;
+
+  const mergedRequiredMark = useMemo(() => {
+    if (requiredMark !== undefined) {
+      return requiredMark;
+    }
+
+    if (contextForm && contextForm.requiredMark !== undefined) {
+      return contextForm.requiredMark;
+    }
+
+    if (hideRequiredMark) {
+      return false;
+    }
+
+    return true;
+  }, [hideRequiredMark, requiredMark, contextForm]);
+
+  const mergedColon = colon ?? contextForm?.colon;
 
   const prefixCls = getPrefixCls('form', customizePrefixCls);
 
@@ -54,7 +81,7 @@ const InternalForm: React.ForwardRefRenderFunction<unknown, FormProps> = (props,
     prefixCls,
     {
       [`${prefixCls}-${layout}`]: true,
-      [`${prefixCls}-hide-required-mark`]: hideRequiredMark,
+      [`${prefixCls}-hide-required-mark`]: mergedRequiredMark === false,
       [`${prefixCls}-rtl`]: direction === 'rtl',
       [`${prefixCls}-${size}`]: size,
     },
@@ -65,28 +92,34 @@ const InternalForm: React.ForwardRefRenderFunction<unknown, FormProps> = (props,
   const { __INTERNAL__ } = wrapForm;
   __INTERNAL__.name = name;
 
-  const formContextValue = React.useMemo(
+  const formContextValue = useMemo<FormContextProps>(
     () => ({
       name,
       labelAlign,
       labelCol,
+      labelWrap,
       wrapperCol,
       vertical: layout === 'vertical',
-      colon,
+      colon: mergedColon,
+      requiredMark: mergedRequiredMark,
       itemRef: __INTERNAL__.itemRef,
+      form: wrapForm,
     }),
-    [name, labelAlign, labelCol, wrapperCol, layout, colon],
+    [name, labelAlign, labelCol, wrapperCol, layout, mergedColon, mergedRequiredMark, wrapForm],
   );
 
   React.useImperativeHandle(ref, () => wrapForm);
 
   const onInternalFinishFailed = (errorInfo: ValidateErrorEntity) => {
-    if (onFinishFailed) {
-      onFinishFailed(errorInfo);
-    }
+    onFinishFailed?.(errorInfo);
+
+    let defaultScrollToFirstError: Options = { block: 'nearest' };
 
     if (scrollToFirstError && errorInfo.errorFields.length) {
-      wrapForm.scrollToField(errorInfo.errorFields[0].name);
+      if (typeof scrollToFirstError === 'object') {
+        defaultScrollToFirstError = scrollToFirstError;
+      }
+      wrapForm.scrollToField(errorInfo.errorFields[0].name, defaultScrollToFirstError);
     }
   };
 
@@ -96,6 +129,7 @@ const InternalForm: React.ForwardRefRenderFunction<unknown, FormProps> = (props,
         <FieldForm
           id={name}
           {...restFormProps}
+          name={name}
           onFinishFailed={onInternalFinishFailed}
           form={wrapForm}
           className={formClassName}
@@ -105,8 +139,10 @@ const InternalForm: React.ForwardRefRenderFunction<unknown, FormProps> = (props,
   );
 };
 
-const Form = React.forwardRef<FormInstance, FormProps>(InternalForm);
+const Form = React.forwardRef<FormInstance, FormProps>(InternalForm) as <Values = any>(
+  props: React.PropsWithChildren<FormProps<Values>> & { ref?: React.Ref<FormInstance<Values>> },
+) => React.ReactElement;
 
-export { useForm, List, FormInstance };
+export { useForm, List, FormInstance, useWatch };
 
 export default Form;

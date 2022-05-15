@@ -5,8 +5,8 @@ import CloseCircleFilled from '@ant-design/icons/CloseCircleFilled';
 import ExclamationCircleFilled from '@ant-design/icons/ExclamationCircleFilled';
 import WarningFilled from '@ant-design/icons/WarningFilled';
 
-import { ConfigConsumerProps, ConfigConsumer } from '../config-provider';
-import devWarning from '../_util/devWarning';
+import { ConfigContext } from '../config-provider';
+import warning from '../_util/warning';
 
 import noFound from './noFound';
 import serverError from './serverError';
@@ -37,22 +37,22 @@ export interface ResultProps {
   prefixCls?: string;
   className?: string;
   style?: React.CSSProperties;
+  children?: React.ReactNode;
 }
 
 // ExceptionImageMap keys
 const ExceptionStatus = Object.keys(ExceptionMap);
 
 /**
- * render icon
- * if ExceptionStatus includes ,render svg image
- * else render iconNode
+ * Render icon if ExceptionStatus includes ,render svg image else render iconNode
+ *
  * @param prefixCls
  * @param {status, icon}
  */
 const renderIcon = (prefixCls: string, { status, icon }: ResultProps) => {
   const className = classNames(`${prefixCls}-icon`);
 
-  devWarning(
+  warning(
     !(typeof icon === 'string' && icon.length > 2),
     'Result',
     `\`icon\` is using ReactNode instead of string naming in v4. Please check \`${icon}\` at https://ant.design/components/icon`,
@@ -66,7 +66,6 @@ const renderIcon = (prefixCls: string, { status, icon }: ResultProps) => {
       </div>
     );
   }
-
   const iconNode = React.createElement(
     IconMap[status as Exclude<ResultStatusType, ExceptionStatusType>],
   );
@@ -78,49 +77,41 @@ const renderExtra = (prefixCls: string, { extra }: ResultProps) =>
   extra && <div className={`${prefixCls}-extra`}>{extra}</div>;
 
 export interface ResultType extends React.FC<ResultProps> {
-  PRESENTED_IMAGE_404: React.ReactNode;
-  PRESENTED_IMAGE_403: React.ReactNode;
-  PRESENTED_IMAGE_500: React.ReactNode;
+  PRESENTED_IMAGE_404: React.FC;
+  PRESENTED_IMAGE_403: React.FC;
+  PRESENTED_IMAGE_500: React.FC;
 }
 
-const Result: ResultType = props => (
-  <ConfigConsumer>
-    {({ getPrefixCls, direction }: ConfigConsumerProps) => {
-      const {
-        prefixCls: customizePrefixCls,
-        className: customizeClassName,
-        subTitle,
-        title,
-        style,
-        children,
-        status,
-      } = props;
-      const prefixCls = getPrefixCls('result', customizePrefixCls);
-      const className = classNames(prefixCls, `${prefixCls}-${status}`, customizeClassName, {
-        [`${prefixCls}-rtl`]: direction === 'rtl',
-      });
-      return (
-        <div className={className} style={style}>
-          {renderIcon(prefixCls, props)}
-          <div className={`${prefixCls}-title`}>{title}</div>
-          {subTitle && <div className={`${prefixCls}-subtitle`}>{subTitle}</div>}
-          {renderExtra(prefixCls, props)}
-          {children && <div className={`${prefixCls}-content`}>{children}</div>}
-        </div>
-      );
-    }}
-  </ConfigConsumer>
-);
+const Result: ResultType = ({
+  prefixCls: customizePrefixCls,
+  className: customizeClassName,
+  subTitle,
+  title,
+  style,
+  children,
+  status = 'info',
+  icon,
+  extra,
+}) => {
+  const { getPrefixCls, direction } = React.useContext(ConfigContext);
 
-Result.defaultProps = {
-  status: 'info',
+  const prefixCls = getPrefixCls('result', customizePrefixCls);
+  const className = classNames(prefixCls, `${prefixCls}-${status}`, customizeClassName, {
+    [`${prefixCls}-rtl`]: direction === 'rtl',
+  });
+  return (
+    <div className={className} style={style}>
+      {renderIcon(prefixCls, { status, icon })}
+      <div className={`${prefixCls}-title`}>{title}</div>
+      {subTitle && <div className={`${prefixCls}-subtitle`}>{subTitle}</div>}
+      {renderExtra(prefixCls, { extra })}
+      {children && <div className={`${prefixCls}-content`}>{children}</div>}
+    </div>
+  );
 };
 
-// eslint-disable-next-line prefer-destructuring
-Result.PRESENTED_IMAGE_403 = ExceptionMap[403];
-// eslint-disable-next-line prefer-destructuring
-Result.PRESENTED_IMAGE_404 = ExceptionMap[404];
-// eslint-disable-next-line prefer-destructuring
-Result.PRESENTED_IMAGE_500 = ExceptionMap[500];
+Result.PRESENTED_IMAGE_403 = ExceptionMap['403'];
+Result.PRESENTED_IMAGE_404 = ExceptionMap['404'];
+Result.PRESENTED_IMAGE_500 = ExceptionMap['500'];
 
 export default Result;

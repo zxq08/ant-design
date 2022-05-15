@@ -23,34 +23,34 @@ exports[`renders ./components/checkbox/demo/basic.md correctly 1`] = `
 
 exports[`renders ./components/checkbox/demo/check-all.md correctly 1`] = `
 Array [
-  <div
-    class="site-checkbox-all-wrapper"
+  <label
+    class="ant-checkbox-wrapper"
   >
-    <label
-      class="ant-checkbox-wrapper"
+    <span
+      class="ant-checkbox ant-checkbox-indeterminate"
     >
+      <input
+        aria-checked="mixed"
+        class="ant-checkbox-input"
+        type="checkbox"
+      />
       <span
-        class="ant-checkbox ant-checkbox-indeterminate"
-      >
-        <input
-          class="ant-checkbox-input"
-          type="checkbox"
-        />
-        <span
-          class="ant-checkbox-inner"
-        />
-      </span>
-      <span>
-        Check all
-      </span>
-    </label>
-  </div>,
-  <br />,
+        class="ant-checkbox-inner"
+      />
+    </span>
+    <span>
+      Check all
+    </span>
+  </label>,
+  <div
+    class="ant-divider ant-divider-horizontal"
+    role="separator"
+  />,
   <div
     class="ant-checkbox-group"
   >
     <label
-      class="ant-checkbox-group-item ant-checkbox-wrapper ant-checkbox-wrapper-checked"
+      class="ant-checkbox-wrapper ant-checkbox-wrapper-checked ant-checkbox-group-item"
     >
       <span
         class="ant-checkbox ant-checkbox-checked"
@@ -70,7 +70,7 @@ Array [
       </span>
     </label>
     <label
-      class="ant-checkbox-group-item ant-checkbox-wrapper"
+      class="ant-checkbox-wrapper ant-checkbox-group-item"
     >
       <span
         class="ant-checkbox"
@@ -89,7 +89,7 @@ Array [
       </span>
     </label>
     <label
-      class="ant-checkbox-group-item ant-checkbox-wrapper ant-checkbox-wrapper-checked"
+      class="ant-checkbox-wrapper ant-checkbox-wrapper-checked ant-checkbox-group-item"
     >
       <span
         class="ant-checkbox ant-checkbox-checked"
@@ -159,6 +159,209 @@ Array [
 ]
 `;
 
+exports[`renders ./components/checkbox/demo/debug-line.md correctly 1`] = `
+<div>
+  <div
+    class="ant-space ant-space-horizontal ant-space-align-center"
+    style="border:1px solid red;margin-bottom:16px"
+  >
+    <div
+      class="ant-space-item"
+      style="margin-right:8px"
+    >
+      <label
+        class="ant-checkbox-wrapper"
+      >
+        <span
+          class="ant-checkbox"
+        >
+          <input
+            class="ant-checkbox-input"
+            type="checkbox"
+            value="light"
+          />
+          <span
+            class="ant-checkbox-inner"
+          />
+        </span>
+      </label>
+    </div>
+    <div
+      class="ant-space-item"
+      style="margin-right:8px"
+    >
+      <div>
+        Bamboo
+      </div>
+    </div>
+    <div
+      class="ant-space-item"
+    >
+      <label
+        class="ant-checkbox-wrapper"
+      >
+        <span
+          class="ant-checkbox"
+        >
+          <input
+            class="ant-checkbox-input"
+            type="checkbox"
+            value="little"
+          />
+          <span
+            class="ant-checkbox-inner"
+          />
+        </span>
+        <span>
+          Little
+        </span>
+      </label>
+    </div>
+  </div>
+  <div
+    class="ant-space ant-space-horizontal ant-space-align-center"
+    style="border:1px solid red;margin-bottom:16px"
+  >
+    <div
+      class="ant-space-item"
+      style="margin-right:8px"
+    >
+      <label
+        class="ant-radio-wrapper"
+      >
+        <span
+          class="ant-radio"
+        >
+          <input
+            class="ant-radio-input"
+            type="radio"
+            value="light"
+          />
+          <span
+            class="ant-radio-inner"
+          />
+        </span>
+      </label>
+    </div>
+    <div
+      class="ant-space-item"
+      style="margin-right:8px"
+    >
+      <div>
+        Bamboo
+      </div>
+    </div>
+    <div
+      class="ant-space-item"
+    >
+      <label
+        class="ant-radio-wrapper"
+      >
+        <span
+          class="ant-radio"
+        >
+          <input
+            class="ant-radio-input"
+            type="radio"
+            value="little"
+          />
+          <span
+            class="ant-radio-inner"
+          />
+        </span>
+        <span>
+          Little
+        </span>
+      </label>
+    </div>
+  </div>
+  <div
+    style="border:1px solid red;margin-bottom:16px;display:flex;align-items:center"
+  >
+    <label
+      class="ant-checkbox-wrapper"
+    >
+      <span
+        class="ant-checkbox"
+      >
+        <input
+          class="ant-checkbox-input"
+          type="checkbox"
+          value="light"
+        />
+        <span
+          class="ant-checkbox-inner"
+        />
+      </span>
+    </label>
+    <div>
+      Bamboo
+    </div>
+    <label
+      class="ant-checkbox-wrapper"
+    >
+      <span
+        class="ant-checkbox"
+      >
+        <input
+          class="ant-checkbox-input"
+          type="checkbox"
+          value="little"
+        />
+        <span
+          class="ant-checkbox-inner"
+        />
+      </span>
+      <span>
+        Little
+      </span>
+    </label>
+  </div>
+  <div
+    style="border:1px solid red;margin-bottom:16px;display:flex;align-items:center"
+  >
+    <label
+      class="ant-radio-wrapper"
+    >
+      <span
+        class="ant-radio"
+      >
+        <input
+          class="ant-radio-input"
+          type="radio"
+          value="light"
+        />
+        <span
+          class="ant-radio-inner"
+        />
+      </span>
+    </label>
+    <div>
+      Bamboo
+    </div>
+    <label
+      class="ant-radio-wrapper"
+    >
+      <span
+        class="ant-radio"
+      >
+        <input
+          class="ant-radio-input"
+          type="radio"
+          value="little"
+        />
+        <span
+          class="ant-radio-inner"
+        />
+      </span>
+      <span>
+        Little
+      </span>
+    </label>
+  </div>
+</div>
+`;
+
 exports[`renders ./components/checkbox/demo/disabled.md correctly 1`] = `
 Array [
   <label
@@ -204,7 +407,7 @@ Array [
     class="ant-checkbox-group"
   >
     <label
-      class="ant-checkbox-group-item ant-checkbox-wrapper ant-checkbox-wrapper-checked"
+      class="ant-checkbox-wrapper ant-checkbox-wrapper-checked ant-checkbox-group-item"
     >
       <span
         class="ant-checkbox ant-checkbox-checked"
@@ -224,7 +427,7 @@ Array [
       </span>
     </label>
     <label
-      class="ant-checkbox-group-item ant-checkbox-wrapper"
+      class="ant-checkbox-wrapper ant-checkbox-group-item"
     >
       <span
         class="ant-checkbox"
@@ -243,7 +446,7 @@ Array [
       </span>
     </label>
     <label
-      class="ant-checkbox-group-item ant-checkbox-wrapper"
+      class="ant-checkbox-wrapper ant-checkbox-group-item"
     >
       <span
         class="ant-checkbox"
@@ -268,7 +471,7 @@ Array [
     class="ant-checkbox-group"
   >
     <label
-      class="ant-checkbox-group-item ant-checkbox-wrapper"
+      class="ant-checkbox-wrapper ant-checkbox-group-item"
     >
       <span
         class="ant-checkbox"
@@ -287,7 +490,7 @@ Array [
       </span>
     </label>
     <label
-      class="ant-checkbox-group-item ant-checkbox-wrapper ant-checkbox-wrapper-checked"
+      class="ant-checkbox-wrapper ant-checkbox-wrapper-checked ant-checkbox-group-item"
     >
       <span
         class="ant-checkbox ant-checkbox-checked"
@@ -307,7 +510,7 @@ Array [
       </span>
     </label>
     <label
-      class="ant-checkbox-group-item ant-checkbox-wrapper"
+      class="ant-checkbox-wrapper ant-checkbox-group-item"
     >
       <span
         class="ant-checkbox"
@@ -332,7 +535,7 @@ Array [
     class="ant-checkbox-group"
   >
     <label
-      class="ant-checkbox-group-item ant-checkbox-wrapper ant-checkbox-wrapper-checked ant-checkbox-wrapper-disabled"
+      class="ant-checkbox-wrapper ant-checkbox-wrapper-checked ant-checkbox-wrapper-disabled ant-checkbox-group-item"
     >
       <span
         class="ant-checkbox ant-checkbox-checked ant-checkbox-disabled"
@@ -353,7 +556,7 @@ Array [
       </span>
     </label>
     <label
-      class="ant-checkbox-group-item ant-checkbox-wrapper ant-checkbox-wrapper-disabled"
+      class="ant-checkbox-wrapper ant-checkbox-wrapper-disabled ant-checkbox-group-item"
     >
       <span
         class="ant-checkbox ant-checkbox-disabled"
@@ -373,7 +576,7 @@ Array [
       </span>
     </label>
     <label
-      class="ant-checkbox-group-item ant-checkbox-wrapper ant-checkbox-wrapper-disabled"
+      class="ant-checkbox-wrapper ant-checkbox-wrapper-disabled ant-checkbox-group-item"
     >
       <span
         class="ant-checkbox ant-checkbox-disabled"
@@ -403,9 +606,11 @@ exports[`renders ./components/checkbox/demo/layout.md correctly 1`] = `
 >
   <div
     class="ant-row"
+    role="row"
   >
     <div
       class="ant-col ant-col-8"
+      role="cell"
     >
       <label
         class="ant-checkbox-wrapper"
@@ -429,6 +634,7 @@ exports[`renders ./components/checkbox/demo/layout.md correctly 1`] = `
     </div>
     <div
       class="ant-col ant-col-8"
+      role="cell"
     >
       <label
         class="ant-checkbox-wrapper"
@@ -452,6 +658,7 @@ exports[`renders ./components/checkbox/demo/layout.md correctly 1`] = `
     </div>
     <div
       class="ant-col ant-col-8"
+      role="cell"
     >
       <label
         class="ant-checkbox-wrapper"
@@ -475,6 +682,7 @@ exports[`renders ./components/checkbox/demo/layout.md correctly 1`] = `
     </div>
     <div
       class="ant-col ant-col-8"
+      role="cell"
     >
       <label
         class="ant-checkbox-wrapper"
@@ -498,6 +706,7 @@ exports[`renders ./components/checkbox/demo/layout.md correctly 1`] = `
     </div>
     <div
       class="ant-col ant-col-8"
+      role="cell"
     >
       <label
         class="ant-checkbox-wrapper"

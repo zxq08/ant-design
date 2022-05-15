@@ -15,6 +15,8 @@ title:
 
 **注意，此示例使用 [模拟接口](https://randomuser.me)，展示数据可能不准确，请打开网络面板查看请求。**
 
+> 🛎️ 想要 3 分钟实现？试试 [ProTable](https://procomponents.ant.design/components/table)！
+
 ## en-US
 
 This example shows how to fetch and present data from a remote server, and how to implement filtering and sorting in server side by sending related parameters to server.
@@ -25,7 +27,7 @@ Setting `rowSelection.preserveSelectedRowKeys` to keep the `key` when enable sel
 
 ```jsx
 import { Table } from 'antd';
-import reqwest from 'reqwest';
+import qs from 'qs';
 
 const columns = [
   {
@@ -50,13 +52,11 @@ const columns = [
   },
 ];
 
-const getRandomuserParams = params => {
-  return {
-    results: params.pagination.pageSize,
-    page: params.pagination.current,
-    ...params,
-  };
-};
+const getRandomuserParams = params => ({
+  results: params.pagination.pageSize,
+  page: params.pagination.current,
+  ...params,
+});
 
 class App extends React.Component {
   state = {
@@ -84,24 +84,21 @@ class App extends React.Component {
 
   fetch = (params = {}) => {
     this.setState({ loading: true });
-    reqwest({
-      url: 'https://randomuser.me/api',
-      method: 'get',
-      type: 'json',
-      data: getRandomuserParams(params),
-    }).then(data => {
-      console.log(data);
-      this.setState({
-        loading: false,
-        data: data.results,
-        pagination: {
-          ...params.pagination,
-          total: 200,
-          // 200 is mock data, you should read it from server
-          // total: data.totalCount,
-        },
+    fetch(`https://randomuser.me/api?${qs.stringify(getRandomuserParams(params))}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log(data);
+        this.setState({
+          loading: false,
+          data: data.results,
+          pagination: {
+            ...params.pagination,
+            total: 200,
+            // 200 is mock data, you should read it from server
+            // total: data.totalCount,
+          },
+        });
       });
-    });
   };
 
   render() {
@@ -119,5 +116,5 @@ class App extends React.Component {
   }
 }
 
-ReactDOM.render(<App />, mountNode);
+export default App;
 ```

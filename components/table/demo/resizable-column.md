@@ -3,6 +3,7 @@ order: 27
 title:
   en-US: Resizable column
   zh-CN: 可伸缩列
+debug: true
 ---
 
 ## zh-CN
@@ -106,16 +107,18 @@ class Demo extends React.Component {
     },
   ];
 
-  handleResize = index => (e, { size }) => {
-    this.setState(({ columns }) => {
-      const nextColumns = [...columns];
-      nextColumns[index] = {
-        ...nextColumns[index],
-        width: size.width,
-      };
-      return { columns: nextColumns };
-    });
-  };
+  handleResize =
+    index =>
+    (e, { size }) => {
+      this.setState(({ columns }) => {
+        const nextColumns = [...columns];
+        nextColumns[index] = {
+          ...nextColumns[index],
+          width: size.width,
+        };
+        return { columns: nextColumns };
+      });
+    };
 
   render() {
     const columns = this.state.columns.map((col, index) => ({
@@ -130,7 +133,7 @@ class Demo extends React.Component {
   }
 }
 
-ReactDOM.render(<Demo />, mountNode);
+export default Demo;
 ```
 
 ```css
@@ -141,11 +144,11 @@ ReactDOM.render(<Demo />, mountNode);
 
 #components-table-demo-resizable-column .react-resizable-handle {
   position: absolute;
+  right: -5px;
+  bottom: 0;
+  z-index: 1;
   width: 10px;
   height: 100%;
-  bottom: 0;
-  right: -5px;
   cursor: col-resize;
-  z-index: 1;
 }
 ```

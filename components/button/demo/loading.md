@@ -14,39 +14,32 @@ title:
 A loading indicator can be added to a button by setting the `loading` property on the `Button`.
 
 ```jsx
-import { Button } from 'antd';
+import React, { useEffect, useState, useRef } from 'react';
+import { Button, Space } from 'antd';
 import { PoweroffOutlined } from '@ant-design/icons';
 
-class App extends React.Component {
-  state = {
-    loadings: [],
-  };
+export default () => {
+  const [loadings, setLoadings] = useState([]);
 
-  enterLoading = index => {
-    this.setState(({ loadings }) => {
-      const newLoadings = [...loadings];
+  const enterLoading = index => {
+    setLoadings(prevLoadings => {
+      const newLoadings = [...prevLoadings];
       newLoadings[index] = true;
-
-      return {
-        loadings: newLoadings,
-      };
+      return newLoadings;
     });
-    setTimeout(() => {
-      this.setState(({ loadings }) => {
-        const newLoadings = [...loadings];
-        newLoadings[index] = false;
 
-        return {
-          loadings: newLoadings,
-        };
+    setTimeout(() => {
+      setLoadings(prevLoadings => {
+        const newLoadings = [...prevLoadings];
+        newLoadings[index] = false;
+        return newLoadings;
       });
     }, 6000);
   };
 
-  render() {
-    const { loadings } = this.state;
-    return (
-      <>
+  return (
+    <>
+      <Space style={{ width: '100%' }}>
         <Button type="primary" loading>
           Loading
         </Button>
@@ -54,15 +47,17 @@ class App extends React.Component {
           Loading
         </Button>
         <Button type="primary" icon={<PoweroffOutlined />} loading />
-        <br />
-        <Button type="primary" loading={loadings[0]} onClick={() => this.enterLoading(0)}>
+      </Space>
+
+      <Space style={{ width: '100%' }}>
+        <Button type="primary" loading={loadings[0]} onClick={() => enterLoading(0)}>
           Click me!
         </Button>
         <Button
           type="primary"
           icon={<PoweroffOutlined />}
           loading={loadings[1]}
-          onClick={() => this.enterLoading(1)}
+          onClick={() => enterLoading(1)}
         >
           Click me!
         </Button>
@@ -70,12 +65,10 @@ class App extends React.Component {
           type="primary"
           icon={<PoweroffOutlined />}
           loading={loadings[2]}
-          onClick={() => this.enterLoading(2)}
+          onClick={() => enterLoading(2)}
         />
-      </>
-    );
-  }
-}
-
-ReactDOM.render(<App />, mountNode);
+      </Space>
+    </>
+  );
+};
 ```

@@ -233,10 +233,12 @@ exports[`renders ./components/card/demo/in-column.md correctly 1`] = `
 >
   <div
     class="ant-row"
+    role="row"
     style="margin-left:-8px;margin-right:-8px"
   >
     <div
       class="ant-col ant-col-8"
+      role="cell"
       style="padding-left:8px;padding-right:8px"
     >
       <div
@@ -264,6 +266,7 @@ exports[`renders ./components/card/demo/in-column.md correctly 1`] = `
     </div>
     <div
       class="ant-col ant-col-8"
+      role="cell"
       style="padding-left:8px;padding-right:8px"
     >
       <div
@@ -291,6 +294,7 @@ exports[`renders ./components/card/demo/in-column.md correctly 1`] = `
     </div>
     <div
       class="ant-col ant-col-8"
+      role="cell"
       style="padding-left:8px;padding-right:8px"
     >
       <div
@@ -434,10 +438,12 @@ Array [
       >
         <div
           class="ant-row"
+          role="row"
           style="margin-left:-4px;margin-right:-4px"
         >
           <div
             class="ant-col ant-col-22"
+            role="cell"
             style="padding-left:4px;padding-right:4px"
           >
             <div
@@ -447,10 +453,12 @@ Array [
         </div>
         <div
           class="ant-row"
+          role="row"
           style="margin-left:-4px;margin-right:-4px"
         >
           <div
             class="ant-col ant-col-8"
+            role="cell"
             style="padding-left:4px;padding-right:4px"
           >
             <div
@@ -459,6 +467,7 @@ Array [
           </div>
           <div
             class="ant-col ant-col-15"
+            role="cell"
             style="padding-left:4px;padding-right:4px"
           >
             <div
@@ -468,10 +477,12 @@ Array [
         </div>
         <div
           class="ant-row"
+          role="row"
           style="margin-left:-4px;margin-right:-4px"
         >
           <div
             class="ant-col ant-col-6"
+            role="cell"
             style="padding-left:4px;padding-right:4px"
           >
             <div
@@ -480,6 +491,7 @@ Array [
           </div>
           <div
             class="ant-col ant-col-18"
+            role="cell"
             style="padding-left:4px;padding-right:4px"
           >
             <div
@@ -489,10 +501,12 @@ Array [
         </div>
         <div
           class="ant-row"
+          role="row"
           style="margin-left:-4px;margin-right:-4px"
         >
           <div
             class="ant-col ant-col-13"
+            role="cell"
             style="padding-left:4px;padding-right:4px"
           >
             <div
@@ -501,6 +515,7 @@ Array [
           </div>
           <div
             class="ant-col ant-col-9"
+            role="cell"
             style="padding-left:4px;padding-right:4px"
           >
             <div
@@ -510,10 +525,12 @@ Array [
         </div>
         <div
           class="ant-row"
+          role="row"
           style="margin-left:-4px;margin-right:-4px"
         >
           <div
             class="ant-col ant-col-4"
+            role="cell"
             style="padding-left:4px;padding-right:4px"
           >
             <div
@@ -522,6 +539,7 @@ Array [
           </div>
           <div
             class="ant-col ant-col-3"
+            role="cell"
             style="padding-left:4px;padding-right:4px"
           >
             <div
@@ -530,6 +548,7 @@ Array [
           </div>
           <div
             class="ant-col ant-col-16"
+            role="cell"
             style="padding-left:4px;padding-right:4px"
           >
             <div
@@ -587,7 +606,6 @@ Array [
           >
             <svg
               aria-hidden="true"
-              class=""
               data-icon="setting"
               fill="currentColor"
               focusable="false"
@@ -613,7 +631,6 @@ Array [
           >
             <svg
               aria-hidden="true"
-              class=""
               data-icon="edit"
               fill="currentColor"
               focusable="false"
@@ -639,7 +656,6 @@ Array [
           >
             <svg
               aria-hidden="true"
-              class=""
               data-icon="ellipsis"
               fill="currentColor"
               focusable="false"
@@ -685,7 +701,7 @@ exports[`renders ./components/card/demo/meta.md correctly 1`] = `
           class="ant-avatar ant-avatar-circle ant-avatar-image"
         >
           <img
-            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+            src="https://joeschmoe.io/api/v1/random"
           />
         </span>
       </div>
@@ -719,7 +735,6 @@ exports[`renders ./components/card/demo/meta.md correctly 1`] = `
         >
           <svg
             aria-hidden="true"
-            class=""
             data-icon="setting"
             fill="currentColor"
             focusable="false"
@@ -745,7 +760,6 @@ exports[`renders ./components/card/demo/meta.md correctly 1`] = `
         >
           <svg
             aria-hidden="true"
-            class=""
             data-icon="edit"
             fill="currentColor"
             focusable="false"
@@ -771,7 +785,6 @@ exports[`renders ./components/card/demo/meta.md correctly 1`] = `
         >
           <svg
             aria-hidden="true"
-            class=""
             data-icon="ellipsis"
             fill="currentColor"
             focusable="false"
@@ -839,7 +852,7 @@ Array [
         </div>
       </div>
       <div
-        class="ant-tabs ant-tabs-top ant-card-head-tabs ant-tabs-large"
+        class="ant-tabs ant-tabs-top ant-tabs-large ant-card-head-tabs"
       >
         <div
           class="ant-tabs-nav"
@@ -902,7 +915,6 @@ Array [
               >
                 <svg
                   aria-hidden="true"
-                  class=""
                   data-icon="ellipsis"
                   fill="currentColor"
                   focusable="false"
@@ -962,7 +974,7 @@ Array [
         class="ant-card-head-wrapper"
       />
       <div
-        class="ant-tabs ant-tabs-top ant-card-head-tabs ant-tabs-large"
+        class="ant-tabs ant-tabs-top ant-tabs-large ant-card-head-tabs"
       >
         <div
           class="ant-tabs-nav"
@@ -1037,7 +1049,6 @@ Array [
               >
                 <svg
                   aria-hidden="true"
-                  class=""
                   data-icon="ellipsis"
                   fill="currentColor"
                   focusable="false"

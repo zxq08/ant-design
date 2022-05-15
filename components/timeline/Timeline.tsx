@@ -2,7 +2,8 @@ import * as React from 'react';
 import classNames from 'classnames';
 import LoadingOutlined from '@ant-design/icons/LoadingOutlined';
 
-import TimelineItem, { TimeLineItemProps } from './TimelineItem';
+import type { TimelineItemProps } from './TimelineItem';
+import TimelineItem from './TimelineItem';
 import { ConfigContext } from '../config-provider';
 import { cloneElement } from '../_util/reactNode';
 
@@ -15,10 +16,11 @@ export interface TimelineProps {
   style?: React.CSSProperties;
   reverse?: boolean;
   mode?: 'left' | 'alternate' | 'right';
+  children?: React.ReactNode;
 }
 
 interface TimelineType extends React.FC<TimelineProps> {
-  Item: React.FC<TimeLineItemProps>;
+  Item: React.FC<TimelineItemProps>;
 }
 
 const Timeline: TimelineType = props => {
@@ -29,8 +31,8 @@ const Timeline: TimelineType = props => {
     pendingDot,
     children,
     className,
-    reverse,
-    mode,
+    reverse = false,
+    mode = '' as TimelineProps['mode'],
     ...restProps
   } = props;
   const prefixCls = getPrefixCls('timeline', customizePrefixCls);
@@ -42,9 +44,11 @@ const Timeline: TimelineType = props => {
     </TimelineItem>
   ) : null;
 
-  const timeLineItems = reverse
-    ? [pendingItem, ...React.Children.toArray(children).reverse()]
-    : [...React.Children.toArray(children), pendingItem];
+  const timeLineItems = React.Children.toArray(children);
+  timeLineItems.push(pendingItem as any);
+  if (reverse) {
+    timeLineItems.reverse();
+  }
 
   const getPositionCls = (ele: React.ReactElement<any>, idx: number) => {
     if (mode === 'alternate') {
@@ -96,10 +100,5 @@ const Timeline: TimelineType = props => {
 };
 
 Timeline.Item = TimelineItem;
-
-Timeline.defaultProps = {
-  reverse: false,
-  mode: '' as TimelineProps['mode'],
-};
 
 export default Timeline;

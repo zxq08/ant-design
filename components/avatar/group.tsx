@@ -1,9 +1,12 @@
 import * as React from 'react';
 import classNames from 'classnames';
 import toArray from 'rc-util/lib/Children/toArray';
+import { cloneElement } from '../_util/reactNode';
 import { ConfigContext } from '../config-provider';
 import Avatar from './avatar';
 import Popover from '../popover';
+import type { AvatarSize } from './SizeContext';
+import { SizeContextProvider } from './SizeContext';
 
 export interface GroupProps {
   className?: string;
@@ -13,12 +16,20 @@ export interface GroupProps {
   maxCount?: number;
   maxStyle?: React.CSSProperties;
   maxPopoverPlacement?: 'top' | 'bottom';
+  maxPopoverTrigger?: 'hover' | 'focus' | 'click';
+  /*
+   * Size of avatar, options: `large`, `small`, `default`
+   * or a custom number size
+   * */
+  size?: AvatarSize;
 }
 
 const Group: React.FC<GroupProps> = props => {
   const { getPrefixCls, direction } = React.useContext(ConfigContext);
-  const { prefixCls: customizePrefixCls, className = '', maxCount, maxStyle } = props;
+  const { prefixCls: customizePrefixCls, className = '', maxCount, maxStyle, size } = props;
+
   const prefixCls = getPrefixCls('avatar-group', customizePrefixCls);
+
   const cls = classNames(
     prefixCls,
     {
@@ -27,16 +38,22 @@ const Group: React.FC<GroupProps> = props => {
     className,
   );
 
-  const { children, maxPopoverPlacement = 'top' } = props;
-  const childrenWithProps = toArray(children);
+  const { children, maxPopoverPlacement = 'top', maxPopoverTrigger = 'hover' } = props;
+  const childrenWithProps = toArray(children).map((child, index) =>
+    cloneElement(child, {
+      key: `avatar-key-${index}`,
+    }),
+  );
+
   const numOfChildren = childrenWithProps.length;
   if (maxCount && maxCount < numOfChildren) {
     const childrenShow = childrenWithProps.slice(0, maxCount);
     const childrenHidden = childrenWithProps.slice(maxCount, numOfChildren);
     childrenShow.push(
       <Popover
+        key="avatar-popover-key"
         content={childrenHidden}
-        trigger="hover"
+        trigger={maxPopoverTrigger}
         placement={maxPopoverPlacement}
         overlayClassName={`${prefixCls}-popover`}
       >
@@ -44,15 +61,20 @@ const Group: React.FC<GroupProps> = props => {
       </Popover>,
     );
     return (
-      <div className={cls} style={props.style}>
-        {childrenShow}
-      </div>
+      <SizeContextProvider size={size}>
+        <div className={cls} style={props.style}>
+          {childrenShow}
+        </div>
+      </SizeContextProvider>
     );
   }
+
   return (
-    <div className={cls} style={props.style}>
-      {children}
-    </div>
+    <SizeContextProvider size={size}>
+      <div className={cls} style={props.style}>
+        {childrenWithProps}
+      </div>
+    </SizeContextProvider>
   );
 };
 

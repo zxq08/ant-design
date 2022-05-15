@@ -6,57 +6,12 @@ title: Grid
 cover: https://gw.alipayobjects.com/zos/alicdn/5rWLU27so/Grid.svg
 ---
 
-24 Grids System。
+24 Grids System.
 
 ## Design concept
 
 <div class="grid-demo">
-<div class="ant-row demo-row">
-  <div class="ant-col-24 demo-col demo-col-1">
-    100%
-  </div>
-</div>
-<div class="ant-row demo-row">
-  <div class="ant-col-6 demo-col demo-col-2">
-    25%
-  </div>
-  <div class="ant-col-6 demo-col demo-col-3">
-    25%
-  </div>
-  <div class="ant-col-6 demo-col demo-col-2">
-    25%
-  </div>
-  <div class="ant-col-6 demo-col demo-col-3">
-    25%
-  </div>
-</div>
-<div class="ant-row demo-row">
-  <div class="ant-col-8 demo-col demo-col-4">
-    33.33%
-  </div>
-  <div class="ant-col-8 demo-col demo-col-5">
-    33.33%
-  </div>
-  <div class="ant-col-8 demo-col demo-col-4">
-    33.33%
-  </div>
-</div>
-<div class="ant-row demo-row">
-  <div class="ant-col-12 demo-col demo-col-1">
-    50%
-  </div>
-  <div class="ant-col-12 demo-col demo-col-3">
-    50%
-  </div>
-</div>
-<div class="ant-row demo-row">
-  <div class="ant-col-16 demo-col demo-col-4">
-    66.66%
-  </div>
-  <div class="ant-col-8 demo-col demo-col-5">
-    33.33%
-  </div>
-</div>
+  <img src="https://gw.alipayobjects.com/zos/bmw-prod/9189c9ef-c601-40dc-9960-c11dbb681888.svg" alt="grid design" />
 </div>
 
 In most business situations, Ant Design needs to solve a lot of information storage problems within the design area, so based on 12 Grids System, we divided the design area into 24 sections.
@@ -69,8 +24,8 @@ In the grid system, we define the frame outside the information area based on `r
 
 Following is a brief look at how it works:
 
-- Establish a set of `column` in the horizontal space defined by `row` (abbreviated col)
-- Your content elements should be placed directly in the `col`, and only `col` should be placed directly in `row`
+- Establish a set of `column` in the horizontal space defined by `row` (abbreviated col).
+- Your content elements should be placed directly in the `col`, and only `col` should be placed directly in `row`.
 - The column grid system is a value of 1-24 to represent its range spans. For example, three columns of equal width can be created by `<Col span={8} />`.
 - If the sum of `col` spans in a `row` are more than 24, then the overflowing `col` as a whole will start a new line arrangement.
 
@@ -90,8 +45,9 @@ If the Ant Design grid layout component does not meet your needs, you can use th
 | Property | Description | Type | Default | Version |
 | --- | --- | --- | --- | --- |
 | align | Vertical alignment | `top` \| `middle` \| `bottom` | `top` |  |
-| gutter | Spacing between grids, could be a number or a object like `{ xs: 8, sm: 16, md: 24}`. or you can use array to make horizontal and vertical spacing work at the same time `[horizontal, vertical]` | number \| object \| array | 0 |  |  |
-| justify | Horizontal arrangement | `start` \| `end` \| `center` \| `space-around` \| `space-between` | `start` |  |
+| gutter | Spacing between grids, could be a number or a object like { xs: 8, sm: 16, md: 24}. Or you can use array to make horizontal and vertical spacing work at the same time `[horizontal, vertical]` | number \| object \| array | 0 |  |
+| justify | Horizontal arrangement | `start` \| `end` \| `center` \| `space-around` \| `space-between` \| `space-evenly` | `start` |  |
+| wrap | Auto wrap line | boolean | true | 4.8.0 |
 
 ### Col
 

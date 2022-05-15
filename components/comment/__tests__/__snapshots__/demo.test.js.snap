@@ -15,7 +15,7 @@ exports[`renders ./components/comment/demo/basic.md correctly 1`] = `
       >
         <img
           alt="Han Solo"
-          src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+          src="https://joeschmoe.io/api/v1/random"
         />
       </span>
     </div>
@@ -59,7 +59,6 @@ exports[`renders ./components/comment/demo/basic.md correctly 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class=""
                 data-icon="like"
                 fill="currentColor"
                 focusable="false"
@@ -88,7 +87,6 @@ exports[`renders ./components/comment/demo/basic.md correctly 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class=""
                 data-icon="dislike"
                 fill="currentColor"
                 focusable="false"
@@ -134,7 +132,7 @@ exports[`renders ./components/comment/demo/editor.md correctly 1`] = `
       >
         <img
           alt="Han Solo"
-          src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+          src="https://joeschmoe.io/api/v1/random"
         />
       </span>
     </div>
@@ -146,9 +144,11 @@ exports[`renders ./components/comment/demo/editor.md correctly 1`] = `
       >
         <div
           class="ant-row ant-form-item"
+          role="row"
         >
           <div
             class="ant-col ant-form-item-control"
+            role="cell"
           >
             <div
               class="ant-form-item-control-input"
@@ -166,9 +166,11 @@ exports[`renders ./components/comment/demo/editor.md correctly 1`] = `
         </div>
         <div
           class="ant-row ant-form-item"
+          role="row"
         >
           <div
             class="ant-col ant-form-item-control"
+            role="cell"
           >
             <div
               class="ant-form-item-control-input"
@@ -196,7 +198,7 @@ exports[`renders ./components/comment/demo/editor.md correctly 1`] = `
 
 exports[`renders ./components/comment/demo/list.md correctly 1`] = `
 <div
-  class="ant-list comment-list ant-list-split"
+  class="ant-list ant-list-split comment-list"
 >
   <div
     class="ant-list-header"
@@ -224,7 +226,7 @@ exports[`renders ./components/comment/demo/list.md correctly 1`] = `
               >
                 <img
                   alt="comment-avatar"
-                  src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                  src="https://joeschmoe.io/api/v1/random"
                 />
               </div>
               <div
@@ -278,7 +280,7 @@ exports[`renders ./components/comment/demo/list.md correctly 1`] = `
               >
                 <img
                   alt="comment-avatar"
-                  src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                  src="https://joeschmoe.io/api/v1/random"
                 />
               </div>
               <div
@@ -341,7 +343,7 @@ exports[`renders ./components/comment/demo/nested.md correctly 1`] = `
       >
         <img
           alt="Han Solo"
-          src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+          src="https://joeschmoe.io/api/v1/random"
         />
       </span>
     </div>
@@ -394,7 +396,7 @@ exports[`renders ./components/comment/demo/nested.md correctly 1`] = `
           >
             <img
               alt="Han Solo"
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+              src="https://joeschmoe.io/api/v1/random"
             />
           </span>
         </div>
@@ -447,7 +449,7 @@ exports[`renders ./components/comment/demo/nested.md correctly 1`] = `
               >
                 <img
                   alt="Han Solo"
-                  src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                  src="https://joeschmoe.io/api/v1/random"
                 />
               </span>
             </div>
@@ -498,7 +500,7 @@ exports[`renders ./components/comment/demo/nested.md correctly 1`] = `
               >
                 <img
                   alt="Han Solo"
-                  src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                  src="https://joeschmoe.io/api/v1/random"
                 />
               </span>
             </div>

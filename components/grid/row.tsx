@@ -1,26 +1,40 @@
 import * as React from 'react';
 import classNames from 'classnames';
-import { ConfigConsumer, ConfigConsumerProps } from '../config-provider';
+import { ConfigContext } from '../config-provider';
 import RowContext from './RowContext';
 import { tuple } from '../_util/type';
-import ResponsiveObserve, {
-  Breakpoint,
-  ScreenMap,
-  responsiveArray,
-} from '../_util/responsiveObserve';
+import type { Breakpoint, ScreenMap } from '../_util/responsiveObserve';
+import ResponsiveObserve, { responsiveArray } from '../_util/responsiveObserve';
+import useFlexGapSupport from '../_util/hooks/useFlexGapSupport';
 
 const RowAligns = tuple('top', 'middle', 'bottom', 'stretch');
-const RowJustify = tuple('start', 'end', 'center', 'space-around', 'space-between');
+const RowJustify = tuple('start', 'end', 'center', 'space-around', 'space-between', 'space-evenly');
 
-export type Gutter = number | Partial<Record<Breakpoint, number>>;
+type Gap = number | undefined;
+export type Gutter = number | undefined | Partial<Record<Breakpoint, number>>;
 export interface RowProps extends React.HTMLAttributes<HTMLDivElement> {
   gutter?: Gutter | [Gutter, Gutter];
   align?: typeof RowAligns[number];
   justify?: typeof RowJustify[number];
   prefixCls?: string;
+  wrap?: boolean;
 }
 
 const Row = React.forwardRef<HTMLDivElement, RowProps>((props, ref) => {
+  const {
+    prefixCls: customizePrefixCls,
+    justify,
+    align,
+    className,
+    style,
+    children,
+    gutter = 0,
+    wrap,
+    ...others
+  } = props;
+
+  const { getPrefixCls, direction } = React.useContext(ConfigContext);
+
   const [screens, setScreens] = React.useState<ScreenMap>({
     xs: true,
     sm: true,
@@ -29,9 +43,12 @@ const Row = React.forwardRef<HTMLDivElement, RowProps>((props, ref) => {
     xl: true,
     xxl: true,
   });
-  const gutterRef = React.useRef<Gutter | [Gutter, Gutter]>();
-  gutterRef.current = props.gutter;
 
+  const supportFlexGap = useFlexGapSupport();
+
+  const gutterRef = React.useRef<Gutter | [Gutter, Gutter]>(gutter);
+
+  // ================================== Effect ==================================
   React.useEffect(() => {
     const token = ResponsiveObserve.subscribe(screen => {
       const currentGutter = gutterRef.current || 0;
@@ -43,15 +60,13 @@ const Row = React.forwardRef<HTMLDivElement, RowProps>((props, ref) => {
         setScreens(screen);
       }
     });
-    return () => {
-      ResponsiveObserve.unsubscribe(token);
-    };
+    return () => ResponsiveObserve.unsubscribe(token);
   }, []);
 
-  const getGutter = (): [number, number] => {
-    const results: [number, number] = [0, 0];
-    const { gutter = 0 } = props;
-    const normalizedGutter = Array.isArray(gutter) ? gutter : [gutter, 0];
+  // ================================== Render ==================================
+  const getGutter = (): [Gap, Gap] => {
+    const results: [Gap, Gap] = [undefined, undefined];
+    const normalizedGutter = Array.isArray(gutter) ? gutter : [gutter, undefined];
     normalizedGutter.forEach((g, index) => {
       if (typeof g === 'object') {
         for (let i = 0; i < responsiveArray.length; i++) {
@@ -62,61 +77,58 @@ const Row = React.forwardRef<HTMLDivElement, RowProps>((props, ref) => {
           }
         }
       } else {
-        results[index] = g || 0;
+        results[index] = g;
       }
     });
     return results;
   };
 
-  const renderRow = ({ getPrefixCls, direction }: ConfigConsumerProps) => {
-    const {
-      prefixCls: customizePrefixCls,
-      justify,
-      align,
-      className,
-      style,
-      children,
-      ...others
-    } = props;
-    const prefixCls = getPrefixCls('row', customizePrefixCls);
-    const gutter = getGutter();
-    const classes = classNames(
-      prefixCls,
-      {
-        [`${prefixCls}-${justify}`]: justify,
-        [`${prefixCls}-${align}`]: align,
-        [`${prefixCls}-rtl`]: direction === 'rtl',
-      },
-      className,
-    );
-    const rowStyle = {
-      ...(gutter[0]! > 0
-        ? {
-            marginLeft: gutter[0]! / -2,
-            marginRight: gutter[0]! / -2,
-          }
-        : {}),
-      ...(gutter[1]! > 0
-        ? {
-            marginTop: gutter[1]! / -2,
-            marginBottom: gutter[1]! / 2,
-          }
-        : {}),
-      ...style,
-    };
-    const otherProps = { ...others };
-    delete otherProps.gutter;
+  const prefixCls = getPrefixCls('row', customizePrefixCls);
+  const gutters = getGutter();
+  const classes = classNames(
+    prefixCls,
+    {
+      [`${prefixCls}-no-wrap`]: wrap === false,
+      [`${prefixCls}-${justify}`]: justify,
+      [`${prefixCls}-${align}`]: align,
+      [`${prefixCls}-rtl`]: direction === 'rtl',
+    },
+    className,
+  );
 
-    return (
-      <RowContext.Provider value={{ gutter }}>
-        <div {...otherProps} className={classes} style={rowStyle} ref={ref}>
-          {children}
-        </div>
-      </RowContext.Provider>
-    );
-  };
+  // Add gutter related style
+  const rowStyle: React.CSSProperties = {};
+  const horizontalGutter = gutters[0] != null && gutters[0] > 0 ? gutters[0] / -2 : undefined;
+  const verticalGutter = gutters[1] != null && gutters[1] > 0 ? gutters[1] / -2 : undefined;
 
-  return <ConfigConsumer>{renderRow}</ConfigConsumer>;
+  if (horizontalGutter) {
+    rowStyle.marginLeft = horizontalGutter;
+    rowStyle.marginRight = horizontalGutter;
+  }
+
+  if (supportFlexGap) {
+    // Set gap direct if flex gap support
+    [, rowStyle.rowGap] = gutters;
+  } else if (verticalGutter) {
+    rowStyle.marginTop = verticalGutter;
+    rowStyle.marginBottom = verticalGutter;
+  }
+
+  // "gutters" is a new array in each rendering phase, it'll make 'React.useMemo' effectless.
+  // So we deconstruct "gutters" variable here.
+  const [gutterH, gutterV] = gutters;
+  const rowContext = React.useMemo(
+    () => ({ gutter: [gutterH, gutterV] as [number, number], wrap, supportFlexGap }),
+    [gutterH, gutterV, wrap, supportFlexGap],
+  );
+
+  return (
+    <RowContext.Provider value={rowContext}>
+      <div role="row" {...others} className={classes} style={{ ...rowStyle, ...style }} ref={ref}>
+        {children}
+      </div>
+    </RowContext.Provider>
+  );
 });
 
 Row.displayName = 'Row';

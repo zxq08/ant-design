@@ -8,6 +8,7 @@
 @skeleton-button-prefix-cls: ~'@{skeleton-prefix-cls}-button';
 @skeleton-input-prefix-cls: ~'@{skeleton-prefix-cls}-input';
 @skeleton-image-prefix-cls: ~'@{skeleton-prefix-cls}-image';
+@skeleton-block-radius: 4px;
 
 .@{skeleton-prefix-cls} {
   display: table;
@@ -35,6 +36,7 @@
       height: @skeleton-title-height;
       margin-top: @margin-md;
       background: @skeleton-color;
+      border-radius: @skeleton-block-radius;
 
       + .@{skeleton-paragraph-prefix-cls} {
         margin-top: @skeleton-title-paragraph-margin-top;
@@ -50,6 +52,7 @@
         height: @skeleton-paragraph-li-height;
         list-style: none;
         background: @skeleton-color;
+        border-radius: @skeleton-block-radius;
 
         &:last-child:not(:first-child):not(:nth-child(2)) {
           width: 61%;
@@ -103,6 +106,19 @@
 
     .@{skeleton-image-prefix-cls} {
       .skeleton-color();
+    }
+  }
+
+  // Skeleton Block Button, Input
+  &.@{skeleton-prefix-cls}-block {
+    width: 100%;
+
+    .@{skeleton-button-prefix-cls} {
+      width: 100%;
+    }
+
+    .@{skeleton-input-prefix-cls} {
+      width: 100%;
     }
   }
 
@@ -211,10 +227,12 @@
 
 .skeleton-element-button-size(@size) {
   width: @size * 2;
+  min-width: @size * 2;
   .skeleton-element-common-size(@size);
 
   &.@{skeleton-button-prefix-cls}-circle {
     width: @size;
+    min-width: @size;
     border-radius: 50%;
   }
 
@@ -224,7 +242,8 @@
 }
 
 .skeleton-element-input-size(@size) {
-  width: 100%;
+  width: @size * 5;
+  min-width: @size * 5;
   .skeleton-element-common-size(@size);
 }
 
@@ -257,6 +276,7 @@
   0% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0 50%;
   }
